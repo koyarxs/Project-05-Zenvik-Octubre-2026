@@ -1,0 +1,24 @@
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Next.js
+node_modules/
+.next/
+out/
+test-results/
+playwright-report/
+.artifacts/
+*.tsbuildinfo
+
+# Local files
+.DS_Store
+.vscode/
