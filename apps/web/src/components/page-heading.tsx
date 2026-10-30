@@ -1,0 +1,3 @@
+﻿export function PageHeading({ eyebrow, title, description, action }: { eyebrow?: string; title: string; description: string; action?: React.ReactNode }) {
+  return <div className="mb-7 flex flex-wrap items-end justify-between gap-5"><div className="min-w-0">{eyebrow && <p className="eyebrow mb-2.5 text-primary">{eyebrow}</p>}<h1 className="break-words text-[26px] leading-tight font-extrabold tracking-[-.04em] sm:text-[30px]">{title}</h1><p className="mt-2.5 max-w-2xl text-[13px] leading-6 text-muted-foreground">{description}</p></div>{action && <div className="flex flex-wrap gap-2">{action}</div>}</div>;
+}
