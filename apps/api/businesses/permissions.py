@@ -9,7 +9,7 @@ MANAGER_ROLES = (Membership.Role.OWNER, Membership.Role.ADMIN)
 def active_membership(user, business_id):
     return get_object_or_404(
         Membership.objects.select_related('business'),
-        user=user, business_id=business_id, is_active=True, business__is_active=True,
+        user=user, business_id=business_id, is_active=True, access_enabled=True, business__is_active=True,
     )
 
 

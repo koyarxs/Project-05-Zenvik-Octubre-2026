@@ -1,8 +1,10 @@
 import uuid
-from datetime import date, datetime, timezone as datetime_timezone
+from datetime import date, datetime, timedelta, timezone as datetime_timezone
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models, router, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -18,6 +20,11 @@ class Business(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+
+    # Planning policy, not a declaration of legal compliance. Existing data is preserved.
+    planning_max_minutes = models.PositiveIntegerField(null=True, blank=True)
+    planning_block_leave = models.BooleanField(default=True)
+    planning_timezone = models.CharField(max_length=64, default='America/Santiago', editable=False)
 
     class Meta:
         db_table = 'businesses'
@@ -59,6 +66,7 @@ class Membership(models.Model):
     )
     role = models.CharField(max_length=8, choices=Role.choices, default=Role.EMPLOYEE)
     is_active = models.BooleanField(default=True)
+    access_enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
@@ -105,6 +113,11 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=32, blank=True, validators=[RegexValidator(r'^[0-9+() .-]*$', 'Indica un teléfono válido.')])
+    job_title = models.CharField(max_length=120, blank=True)
+    employee_code = models.CharField(max_length=64, blank=True)
+    work_schedule = models.CharField(max_length=120, blank=True)
+    admin_notes = models.TextField(max_length=1000, blank=True)
     hire_date = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -119,7 +132,9 @@ class Employee(models.Model):
 
     class Meta:
         db_table = 'employees'
+        indexes = [models.Index(fields=['business', 'job_title'], name='employee_business_job_idx')]
         constraints = [
+            models.UniqueConstraint(fields=['business', 'employee_code'], condition=~models.Q(employee_code=''), name='unique_business_employee_code'),
             models.UniqueConstraint(
                 fields=['business', 'user'], name='unique_business_employee_user'
             ),
@@ -145,7 +160,16 @@ class Employee(models.Model):
         with transaction.atomic(using=database):
             list(Business.objects.using(database).select_for_update().filter(pk=self.business_id))
             self.full_clean()
-            return super().save(*args, **kwargs)
+            previous = type(self).objects.using(database).filter(pk=self.pk).first()
+            result = super().save(*args, **kwargs)
+            if previous and not EmployeeRevision.objects.using(database).filter(employee=self).exists():
+                EmployeeRevision.objects.using(database).create(employee=self, action='BASELINE', snapshot=previous.snapshot())
+            if not previous or previous.snapshot() != self.snapshot():
+                EmployeeRevision.objects.using(database).create(employee=self, actor=getattr(self, '_actor', None), action='UPDATE' if previous else 'CREATE', snapshot=self.snapshot())
+            return result
+
+    def snapshot(self):
+        return {**{field: str(getattr(self, field)) if getattr(self, field) is not None else None for field in ('first_name', 'last_name', 'email', 'phone', 'job_title', 'employee_code', 'work_schedule', 'admin_notes', 'hire_date', 'is_active', 'user_id')}, 'account_name': self.user.get_username() if self.user_id else None}
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -171,6 +195,9 @@ class Shift(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name='shifts', db_index=False)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
+    break_minutes = models.PositiveIntegerField(default=0)
+    break_included = models.BooleanField(default=True)
+    notes = models.TextField(max_length=1000, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.SCHEDULED)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -198,7 +225,7 @@ class Shift(models.Model):
             raise ValidationError({'business': 'El negocio del turno es inmutable.'})
         if previous and previous.status == self.Status.CANCELLED and any(
             getattr(previous, field) != getattr(self, field)
-            for field in ('employee_id', 'starts_at', 'ends_at', 'status')
+            for field in ('employee_id', 'starts_at', 'ends_at', 'status', 'break_minutes', 'break_included', 'notes')
         ):
             raise ValidationError('Un turno cancelado no se puede modificar. Crea uno nuevo.')
         employee = Employee.objects.using(database).filter(pk=self.employee_id, business_id=self.business_id).first()
@@ -212,6 +239,15 @@ class Shift(models.Model):
             raise ValidationError('Inicio y término deben incluir zona horaria.')
         if self.ends_at <= self.starts_at:
             raise ValidationError({'ends_at': 'El término debe ser posterior al inicio.'})
+        duration = (self.ends_at - self.starts_at).total_seconds() / 60
+        if self.break_minutes >= duration and self.break_minutes:
+            raise ValidationError({'break_minutes': 'La colación debe ser menor que la duración del turno.'})
+        if self.status == self.Status.SCHEDULED:
+            business = Business.objects.using(database).get(pk=self.business_id)
+            if business.planning_max_minutes and duration > business.planning_max_minutes:
+                raise ValidationError('El turno supera la duración máxima configurada por el negocio.')
+            if business.planning_block_leave and self.approved_leave_conflicts(database).exists():
+                raise ValidationError('El horario coincide con un permiso aprobado. Reasigna el turno o cambia su horario.')
         if self.status == self.Status.SCHEDULED and type(self).objects.using(database).filter(
             employee_id=self.employee_id, status=self.Status.SCHEDULED,
             starts_at__lt=self.ends_at, ends_at__gt=self.starts_at,
@@ -223,7 +259,42 @@ class Shift(models.Model):
         with transaction.atomic(using=database):
             list(Business.objects.using(database).select_for_update().filter(pk=self.business_id))
             self.full_clean()
-            return super().save(*args, **kwargs)
+            previous = type(self).objects.using(database).filter(pk=self.pk).first()
+            result = super().save(*args, **kwargs)
+            if previous and not ShiftRevision.objects.using(database).filter(shift=self).exists():
+                ShiftRevision.objects.using(database).create(shift=self, snapshot=previous.snapshot(), action='BASELINE')
+            if not previous or previous.snapshot() != self.snapshot():
+                ShiftRevision.objects.using(database).create(shift=self, actor=getattr(self, '_actor', None), snapshot=self.snapshot(), action='CREATE' if not previous else 'CANCEL' if self.status == self.Status.CANCELLED else 'UPDATE')
+            return result
+
+    def snapshot(self):
+        return {**{field: str(getattr(self, field)) for field in ('employee_id', 'starts_at', 'ends_at', 'status', 'break_minutes', 'break_included', 'notes')}, 'employee_name': str(self.employee)}
+
+    def approved_leave_conflicts(self, database='default'):
+        zone = ZoneInfo(self.business.planning_timezone)
+        return LeaveRequest.objects.using(database).filter(
+            business_id=self.business_id, employee_id=self.employee_id, status='APPROVED',
+            start_date__lte=(self.ends_at - timedelta(microseconds=1)).astimezone(zone).date(),
+            end_date__gte=self.starts_at.astimezone(zone).date(),
+        )
+
+
+class ShiftRevision(models.Model):
+    shift = models.ForeignKey(Shift, on_delete=models.PROTECT, related_name='revisions')
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
+    action = models.CharField(max_length=10)
+    snapshot = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class PlanningOperation(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.PROTECT)
+    request_id = models.UUIDField()
+    digest = models.CharField(max_length=64)
+    shift_ids = models.JSONField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['business', 'request_id'], name='unique_planning_request')]
 
 
 class LeaveRequest(models.Model):
@@ -315,3 +386,11 @@ class LeaveRequest(models.Model):
 @receiver(pre_delete, sender=LeaveRequest)
 def preserve_leave_history(sender, instance, **kwargs):
     raise ValidationError('Las solicitudes se conservan como historial; no se pueden eliminar.')
+
+
+class EmployeeRevision(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name='revisions')
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
+    action = models.CharField(max_length=10)
+    snapshot = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)

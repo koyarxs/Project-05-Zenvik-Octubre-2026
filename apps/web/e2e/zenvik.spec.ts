@@ -11,12 +11,14 @@ test('registro, negocio, trabajador, edición, persistencia y cierre de sesión'
   await expect(page.getByText('Tu primer negocio empieza aquí')).toBeVisible();
   await page.getByRole('link', { name: 'Registrar mi primer negocio' }).click(); await page.getByLabel('Nombre comercial').fill('Negocio creado en navegador'); await page.getByRole('button', { name: 'Registrar negocio', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Negocio creado en navegador' })).toBeVisible(); await expect(page.getByText('Negocio registrado correctamente. Ya puedes comenzar.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sin turnos programados' }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Todo al día por aquí' })).toBeVisible();
   await page.getByRole('link', { name: 'Registrar trabajador', exact: true }).click(); await page.getByLabel('Nombre', { exact: true }).fill('Ana'); await page.getByLabel('Apellido', { exact: true }).fill('Prueba'); await page.getByLabel('Correo electrónico (opcional)').fill('ana-test@example.com'); await page.getByRole('button', { name: 'Registrar trabajador', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Ana Prueba' })).toBeVisible(); await page.getByRole('link', { name: 'Editar trabajador' }).click(); await page.getByLabel('Nombre', { exact: true }).fill('Anita'); await page.getByRole('button', { name: 'Guardar cambios' }).click(); await expect(page.getByRole('heading', { name: 'Anita Prueba' })).toBeVisible();
   await page.reload(); await expect(page.getByRole('heading', { name: 'Anita Prueba' })).toBeVisible();
   await expect.poll(() => page.evaluate(() => localStorage.length)).toBe(0);
   const cookies = await page.context().cookies(); expect(cookies.find(c => c.name === 'sessionid')?.httpOnly).toBe(true); expect(cookies.find(c => c.name === 'csrftoken')?.httpOnly).toBe(true);
-  await page.locator('summary').click(); await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await expect(page).toHaveURL(/iniciar-sesion/);
+  await page.locator('summary').filter({ hasText: 'Menú de usuario' }).click(); await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await expect(page).toHaveURL(/iniciar-sesion/);
   await page.goto('/app'); await expect(page).toHaveURL(/iniciar-sesion/);
 });
 test('selección de negocios y datos reales', async ({ page }) => {

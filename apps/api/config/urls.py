@@ -21,6 +21,7 @@ from django.urls import include, path
 urlpatterns = [
     path('api/v1/auth/', include('accounts.urls')),
     path('api/v1/businesses/', include('businesses.urls')),
+    path('api/v1/businesses/<uuid:business_id>/attendance/', include('attendance.urls')),
 ]
 if settings.ADMIN_ENABLED:
     urlpatterns.append(path('admin/', admin.site.urls))

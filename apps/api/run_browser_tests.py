@@ -1,5 +1,6 @@
 """Run browser tests with a unique, Django-owned temporary PostgreSQL database."""
 import os
+import sys
 import uuid
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -18,4 +19,4 @@ with connection.cursor() as cursor:
     if cursor.fetchone()[0]:
         raise SystemExit('Unexpected temporary database collision; aborting.')
 settings.DATABASES['default']['TEST']['NAME'] = name
-call_command('test', 'businesses.test_browser', interactive=False, verbosity=1)
+call_command('test', *(sys.argv[1:] or ['businesses.test_browser']), interactive=False, verbosity=1)

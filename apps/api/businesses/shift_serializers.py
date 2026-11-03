@@ -27,15 +27,32 @@ class ShiftSerializer(StrictInputMixin, serializers.ModelSerializer):
     employee_name = serializers.SerializerMethodField()
     starts_at = AwareDateTimeField()
     ends_at = AwareDateTimeField()
+    expected_updated_at = AwareDateTimeField(write_only=True, required=False)
+    request_id = serializers.UUIDField(write_only=True, required=False)
+    planned_minutes = serializers.SerializerMethodField()
+    approved_leave_conflict = serializers.SerializerMethodField()
 
     class Meta:
         model = Shift
-        fields = ('id', 'business', 'employee', 'employee_name', 'starts_at', 'ends_at', 'status', 'created_at', 'updated_at')
+        fields = ('id', 'business', 'employee', 'employee_name', 'starts_at', 'ends_at', 'status', 'created_at', 'updated_at', 'break_minutes', 'break_included', 'notes', 'planned_minutes', 'approved_leave_conflict', 'expected_updated_at', 'request_id')
         read_only_fields = ('id', 'business', 'created_at', 'updated_at')
         validators = []
 
     def get_employee_name(self, shift):
         return str(shift.employee)
+
+    def get_planned_minutes(self, shift):
+        return int((shift.ends_at - shift.starts_at).total_seconds() / 60) - (0 if shift.break_included else shift.break_minutes)
+
+    def get_approved_leave_conflict(self, shift):
+        if shift.status == 'CANCELLED':
+            return False
+        leaves = getattr(shift.employee, 'planning_leaves', None)
+        if leaves is None:
+            return shift.approved_leave_conflicts().exists()
+        start = shift.starts_at.astimezone(SANTIAGO).date()
+        end = (shift.ends_at - timedelta(microseconds=1)).astimezone(SANTIAGO).date()
+        return any(leave.start_date <= end and leave.end_date >= start for leave in leaves)
 
     def validate_employee(self, value):
         if not Employee.objects.filter(pk=value, business=self.context['business']).exists():

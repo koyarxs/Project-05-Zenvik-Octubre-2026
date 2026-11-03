@@ -28,6 +28,16 @@ def write_employee(user, business_id, data, employee_id=None):
                 get_object_or_404(Employee, pk=employee_id, business=business)
                 if employee_id else Employee(business=business)
             )
+            data = dict(data)
+            expected = data.pop('expected_updated_at', None)
+            if expected and employee_id and expected != employee.updated_at:
+                raise ValidationError('La ficha cambió. Actualiza la página antes de guardar.')
+            if 'user_id' in data and data['user_id'] != employee.user_id:
+                if membership.role != Membership.Role.OWNER:
+                    raise PermissionDenied('Solo el propietario puede vincular o desvincular cuentas.')
+                if Membership.objects.filter(business=business, role='OWNER', user_id__in=[value for value in (employee.user_id, data['user_id']) if value]).exists():
+                    raise PermissionDenied('La cuenta del propietario requiere un flujo de gestión separado.')
+            employee._actor = user
             for field, value in data.items():
                 setattr(employee, 'user_id' if field == 'user' else field, value)
             employee.save()

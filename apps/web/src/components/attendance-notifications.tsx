@@ -1,0 +1,26 @@
+﻿'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Bell } from 'lucide-react';
+import { useResource } from '@/hooks/use-resource';
+import { api } from '@/lib/http';
+import { attendanceTime } from '@/lib/attendance';
+import { canManage, type Business, type Page } from '@/lib/types';
+import { notificationLabels, type Notification } from '@/lib/incidents';
+import { Button } from './ui/button';
+import { ErrorNotice, Loading, SuccessNotice } from './feedback';
+type Inbox = Page<Notification> & { unread_count: number };
+export function NotificationBell({ business }: { business: Business }) {
+  const resource = useResource<Inbox>(`/api/v1/businesses/${business.id}/attendance/notifications/?unread=true`);
+  const { retry } = resource;
+  useEffect(() => { const refresh = () => { if (document.visibilityState === 'visible') retry(); }; const timer = setInterval(refresh, 60000); window.addEventListener('zenvik:notifications-updated', refresh); return () => { clearInterval(timer); window.removeEventListener('zenvik:notifications-updated', refresh); }; }, [retry]);
+  return <Link className="relative rounded-lg p-2 text-primary" href={`/app/${business.id}/notificaciones`} aria-label={`Notificaciones: ${resource.data?.unread_count ?? 0} sin leer${resource.error ? ', actualización no disponible' : ''}`}><Bell className="size-5" />{!!resource.data?.unread_count && <span className="absolute -right-1 -top-1 rounded-full bg-primary px-1 text-[10px] text-white">{resource.data.unread_count > 99 ? '99+' : resource.data.unread_count}</span>}</Link>;
+}
+export function NotificationsWorkspace({ business }: { business: Business }) {
+  const [page, setPage] = useState(1); const [unread, setUnread] = useState(false); const [error, setError] = useState(''); const [notice, setNotice] = useState(''); const [busy, setBusy] = useState(false);
+  const base = `/api/v1/businesses/${business.id}/attendance`;
+  const resource = useResource<Inbox>(`${base}/notifications/?page=${page}&unread=${unread}`);
+  async function mark(id: string) { setBusy(true); setError(''); try { await api(`${base}/notifications/${id}/read/`, { method: 'POST', body: {} }); resource.retry(); window.dispatchEvent(new Event('zenvik:notifications-updated')); } catch (error) { setError((error as Error).message); } finally { setBusy(false); } }
+  async function scan() { setBusy(true); setError(''); setNotice(''); try { const result = await api<{ created: number }>(`${base}/notifications/scan/`, { method: 'POST', body: {} }); setNotice(`Revisión finalizada: ${result.created} notificaciones nuevas según la política.`); resource.retry(); window.dispatchEvent(new Event('zenvik:notifications-updated')); } catch (error) { setError((error as Error).message); } finally { setBusy(false); } }
+  return <><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="eyebrow text-primary">TU BANDEJA / {business.name}</p><h1 className="mt-2 text-3xl font-bold">Notificaciones</h1></div><Button variant="outline" onClick={resource.retry}>Actualizar notificaciones</Button></div><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={unread} onChange={event => { setUnread(event.target.checked); setPage(1); }} />Solo sin leer</label>{canManage(business.role) && <Button variant="outline" disabled={busy} onClick={scan}>Revisar jornadas incompletas</Button>}</div>{error && <ErrorNotice message={error} />}{notice && <SuccessNotice>{notice}</SuccessNotice>}{resource.error ? <ErrorNotice message={resource.error.message} retry={resource.retry} /> : !resource.data ? <Loading label="Consultando notificaciones…" /> : <><p className="mb-3 text-sm">{resource.data.unread_count} sin leer</p>{!resource.data.count ? <p className="surface p-6">No hay notificaciones para esta vista.</p> : resource.data.results.map(item => <article className={`surface mb-3 flex flex-wrap items-center justify-between gap-3 p-4 ${!item.read_at ? 'border-primary/30' : ''}`} key={item.id}><div className="min-w-0"><h2 className="font-semibold">{notificationLabels[item.code] ?? item.code}</h2><p className="mt-1 text-xs text-muted-foreground">{attendanceTime(item.created_at)} · {item.read_at ? 'Leída' : 'Sin leer'}</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" asChild><Link href={item.incident_id ? `/app/${business.id}/incidencias?id=${item.incident_id}` : `/app/${business.id}/asistencia${item.manager_only ? '/supervision' : ''}`}>Ver recurso</Link></Button>{!item.read_at && <Button disabled={busy} variant="outline" onClick={() => mark(item.id)}>Marcar como leída</Button>}</div></article>)}<div className="my-4 flex items-center justify-between gap-2"><Button variant="outline" disabled={!resource.data.previous} onClick={() => setPage(page - 1)}>Anterior</Button><span className="text-sm">Página {page}</span><Button variant="outline" disabled={!resource.data.next} onClick={() => setPage(page + 1)}>Siguiente</Button></div></>}</>;
+}

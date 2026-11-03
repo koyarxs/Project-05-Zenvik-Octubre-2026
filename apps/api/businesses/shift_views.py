@@ -1,14 +1,20 @@
 from datetime import datetime, time
 
 from django.utils.decorators import method_decorator
+from django.db import transaction
+from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import never_cache
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, serializers
+from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Membership, Shift
-from .permissions import BusinessScopedPermission
+from .models import Business, LeaveRequest, Membership, Shift
+from .permissions import BusinessScopedPermission, MANAGER_ROLES, active_membership
+from config.api import StrictInputMixin
 from .shift_serializers import SANTIAGO, ShiftRangeSerializer, ShiftSerializer
-from .shift_services import write_shift
+from .shift_services import write_shift, write_shift_batch
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -17,7 +23,7 @@ class ShiftBaseView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated, BusinessScopedPermission]
 
     def get_queryset(self):
-        queryset = Shift.objects.filter(business=self.business).select_related('employee').order_by('starts_at', 'id')
+        queryset = Shift.objects.filter(business=self.business).select_related('employee', 'business').prefetch_related(Prefetch('employee__leave_requests', queryset=LeaveRequest.objects.filter(business=self.business, status='APPROVED'), to_attr='planning_leaves')).order_by('starts_at', 'id')
         if self.membership.role == Membership.Role.EMPLOYEE:
             queryset = queryset.filter(employee__user=self.request.user)
         return queryset
@@ -68,3 +74,54 @@ class ShiftDetailView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins
     def perform_destroy(self, instance):
         # Soft cancellation: preserve planning history and permit idempotent retries.
         write_shift(self.request.user, self.business.pk, {}, shift_id=instance.pk, cancel=True)
+
+
+class BatchSerializer(StrictInputMixin, serializers.Serializer):
+    request_id = serializers.UUIDField()
+    shifts = ShiftSerializer(many=True, min_length=1, max_length=100)
+
+
+class ShiftBatchView(ShiftBaseView):
+    def post(self, request, *args, **kwargs):
+        serializer = BatchSerializer(data=request.data, context={'business': self.business})
+        serializer.is_valid(raise_exception=True)
+        rows = serializer.validated_data['shifts']
+        if any('request_id' in row or 'expected_updated_at' in row for row in rows):
+            raise ValidationError('Utiliza una sola clave de reintento para el lote.')
+        shifts = write_shift_batch(request.user, self.business.pk, rows, serializer.validated_data['request_id'])
+        return Response(ShiftSerializer(shifts, many=True).data, status=201)
+
+
+class PlanningSettingsSerializer(StrictInputMixin, serializers.ModelSerializer):
+    planning_max_minutes = serializers.IntegerField(min_value=1, max_value=44640, allow_null=True, required=False)
+
+    class Meta:
+        model = Business
+        fields = ('planning_max_minutes', 'planning_block_leave', 'planning_timezone')
+        read_only_fields = ('planning_timezone',)
+
+
+class PlanningSettingsView(ShiftBaseView):
+    def get(self, request, *args, **kwargs):
+        return Response(PlanningSettingsSerializer(self.business).data)
+
+    def patch(self, request, *args, **kwargs):
+        with transaction.atomic():
+            business = get_object_or_404(Business.objects.select_for_update(), pk=self.business.pk)
+            if active_membership(request.user, business.pk).role not in MANAGER_ROLES:
+                raise PermissionDenied()
+            serializer = PlanningSettingsSerializer(business, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+
+class ShiftHistoryView(ShiftBaseView):
+    def get(self, request, *args, **kwargs):
+        if self.membership.role not in MANAGER_ROLES:
+            raise PermissionDenied()
+        shift = self.get_object()
+        revisions = shift.revisions.select_related('actor').order_by('-created_at', '-id')
+        page = self.paginate_queryset(revisions)
+        data = [{'id': row.pk, 'action': row.action, 'actor_name': row.actor.get_username() if row.actor else None, 'snapshot': row.snapshot, 'created_at': row.created_at} for row in page]
+        return self.get_paginated_response(data)

@@ -151,3 +151,17 @@ compose.yml        PostgreSQL local con volumen persistente
 - [Galería y procedencia de capturas](docs/screenshots/README.md)
 
 Las fuentes incluyen sus licencias OFL. No se ha definido todavía una licencia general de distribución para el código del proyecto.
+
+## Alertas internas de asistencia (entorno local Windows)
+
+La tarea `Zenvik-AttendanceAlerts-Stage14` evalúa las reglas de jornadas incompletas cada cinco minutos mientras el usuario tiene sesión abierta. Solo considera negocios con la política correspondiente habilitada. Usa la conexión de `.env` y requiere las migraciones aplicadas.
+
+```powershell
+# Instalar o actualizar la misma tarea en este equipo:
+.\scripts\install_attendance_alerts.ps1
+# Ejecutar una evaluación y consultar el resultado:
+.\apps\api\.venv\Scripts\python.exe scripts/run_attendance_alerts.py
+Get-Content .artifacts/attendance-alerts.log -Tail 20
+```
+
+Los resultados y condiciones de activación están en [Etapa 14](docs/STAGE-14.md). Esta tarea local no sustituye un planificador de servidor para operación sin sesión de usuario.
