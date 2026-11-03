@@ -1,10 +1,10 @@
 import { api } from './http';
 import type { Business, Employee, Page } from './types';
-export async function listBusinesses(): Promise<Business[]> {
+export async function listBusinesses(signal?: AbortSignal): Promise<Business[]> {
   const results: Business[] = [];
   let page = 1;
   while (true) {
-    const data = await api<Page<Business>>(`/api/v1/businesses/?page=${page}`);
+    const data = await api<Page<Business>>(`/api/v1/businesses/?page=${page}`, { signal });
     results.push(...data.results);
     if (!data.next) return results;
     page++;

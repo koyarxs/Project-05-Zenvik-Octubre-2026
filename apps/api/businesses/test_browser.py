@@ -84,6 +84,97 @@ class FrontendBrowserTests(LiveServerTestCase):
         screenshots.mkdir(parents=True, exist_ok=True)
         for screenshot in (root / 'test-results').glob('*.png'):
             shutil.copy2(screenshot, screenshots / screenshot.name)
+    def test_personnel_frontend_against_isolated_api(self):
+        business = Business.objects.create(name='Equipo de prueba')
+        other = Business.objects.create(name='Otro equipo')
+        for username, role in [('owner_personnel', 'OWNER'), ('admin_personnel', 'ADMIN'), ('worker_personnel', 'EMPLOYEE'), ('unlinked_personnel', 'EMPLOYEE')]:
+            user = get_user_model().objects.create_user(username=username, email=f'{username}@example.test', password='Browser-test!pass-9274')
+            Membership.objects.create(user=user, business=business, role=role)
+            if username == 'worker_personnel':
+                employee = Employee.objects.create(business=business, user=user, first_name='Clara', last_name='Test', job_title='Atención', phone='+56 9 1234 5678', admin_notes='Nota reservada del equipo')
+        foreign = Employee.objects.create(business=other, first_name='Privada', last_name='Test')
+        start = datetime(2026, 12, 10, 12, tzinfo=timezone.utc)
+        Shift.objects.create(business=business, employee=employee, starts_at=start, ends_at=start + timedelta(hours=4))
+        env = {**os.environ, 'DJANGO_API_URL': self.live_server_url, 'APP_ORIGIN': 'http://127.0.0.1:3100',
+               'E2E_BUSINESS_A': str(business.pk), 'E2E_BUSINESS_B': str(other.pk), 'E2E_EMPLOYEE': str(employee.pk), 'E2E_FOREIGN': str(foreign.pk), 'E2E_PERSONNEL': '1'}
+        root = Path(__file__).resolve().parents[2] / 'web'
+        result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/personnel.spec.ts'], cwd=root, env=env, timeout=240, check=False)
+        self.assertEqual(result.returncode, 0, 'Personnel browser suite failed.')
+        screenshots = root.parent.parent / '.artifacts' / 'stage10'
+        screenshots.mkdir(parents=True, exist_ok=True)
+        for screenshot in (root / 'test-results').glob('*.png'):
+            shutil.copy2(screenshot, screenshots / screenshot.name)
+
+    def test_portal_frontend_against_isolated_api(self):
+        business = Business.objects.create(name='Portal de prueba')
+        other = Business.objects.create(name='Segundo espacio')
+        user = get_user_model().objects.create_user(username='worker_portal', email='portal@example.test', password='Browser-test!pass-9274')
+        Membership.objects.create(user=user, business=business, role='EMPLOYEE')
+        Membership.objects.create(user=user, business=other, role='EMPLOYEE')
+        employee = Employee.objects.create(business=business, user=user, first_name='Clara', last_name='Portal', job_title='Operadora', phone='+56 9 1234 5678', admin_notes='Secreto interno')
+        colleague = Employee.objects.create(business=business, first_name='Ficha privada', last_name='Ajena')
+        start = datetime.now(ZoneInfo('America/Santiago')).replace(hour=23, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        Shift.objects.create(business=business, employee=employee, starts_at=start, ends_at=start + timedelta(hours=8), notes='Turno nocturno de prueba', break_minutes=30)
+        env = {**os.environ, 'DJANGO_API_URL': self.live_server_url, 'APP_ORIGIN': 'http://127.0.0.1:3100',
+               'E2E_BUSINESS_A': str(business.pk), 'E2E_BUSINESS_B': str(other.pk), 'E2E_COLLEAGUE': str(colleague.pk), 'E2E_EMPLOYEE': str(employee.pk), 'E2E_PORTAL': '1'}
+        root = Path(__file__).resolve().parents[2] / 'web'
+        result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/portal.spec.ts'], cwd=root, env=env, timeout=240, check=False)
+        self.assertEqual(result.returncode, 0, 'Worker portal browser suite failed.')
+        screenshots = root.parent.parent / '.artifacts' / 'stage11'
+        screenshots.mkdir(parents=True, exist_ok=True)
+        for screenshot in (root / 'test-results').glob('*.png'):
+            shutil.copy2(screenshot, screenshots / screenshot.name)
+
+    def test_attendance_frontend_against_isolated_api(self):
+        from attendance.services import configure_policy, record_event
+        from attendance.serializers import EventInput
+        from uuid import uuid4
+        business = Business.objects.create(name='Asistencia de prueba')
+        people = {}
+        for name, role in [('attendance_worker', 'EMPLOYEE'), ('attendance_exception', 'EMPLOYEE'), ('attendance_peer', 'EMPLOYEE'), ('attendance_owner', 'OWNER')]:
+            user = get_user_model().objects.create_user(username=name, email=f'{name}@example.test', password='Browser-test!pass-9274')
+            Membership.objects.create(user=user, business=business, role=role)
+            person = Employee.objects.create(business=business, user=user, first_name=name, last_name='Prueba')
+            people[name] = (user, person)
+        configure_policy(people['attendance_owner'][0], business.pk, {'expected_version': 0, 'location_required': True, 'max_accuracy_meters': 100, 'retention_days': None, 'sites': [{'name': 'Zona sintética E2E', 'latitude': -33.45, 'longitude': -70.66, 'radius_meters': 150, 'is_active': True}]})
+        data = EventInput(data={'event_type': 'CLOCK_IN', 'request_id': str(uuid4()), 'session_id': None, 'expected_version': 0, 'location': {'latitude': -33.45, 'longitude': -70.66, 'accuracy_meters': 10}, 'location_status': 'AVAILABLE'})
+        data.is_valid(raise_exception=True)
+        peer_event, _ = record_event(people['attendance_peer'][0], business.pk, data.validated_data)
+        env = {**os.environ, 'DJANGO_API_URL': self.live_server_url, 'APP_ORIGIN': 'http://127.0.0.1:3100', 'E2E_BUSINESS_A': str(business.pk), 'E2E_ATTENDANCE': '1', 'E2E_PEER_RECEIPT': str(peer_event.pk)}
+        root = Path(__file__).resolve().parents[2] / 'web'
+        result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/attendance.spec.ts'], cwd=root, env=env, timeout=240, check=False)
+        self.assertEqual(result.returncode, 0, 'Attendance browser suite failed.')
+        screenshots = root.parent.parent / '.artifacts' / 'stage13'
+        screenshots.mkdir(parents=True, exist_ok=True)
+        for screenshot in (root / 'test-results').glob('*.png'):
+            shutil.copy2(screenshot, screenshots / screenshot.name)
+
+    def test_planning_frontend_against_isolated_api(self):
+        # Separate phase keeps realistic authentication rate limits unchanged.
+        business = Business.objects.create(name='Planificación de prueba')
+        user = get_user_model().objects.create_user(username='owner_planning', email='planning@example.test', password='Browser-test!pass-9274')
+        Membership.objects.create(user=user, business=business, role='OWNER')
+        employee = Employee.objects.create(business=business, first_name='Planificación', last_name='Test')
+        env = {**os.environ, 'DJANGO_API_URL': self.live_server_url, 'APP_ORIGIN': 'http://127.0.0.1:3100',
+               'E2E_BUSINESS_A': str(business.pk), 'E2E_COLLEAGUE': str(employee.pk), 'E2E_PLANNING': '1'}
+        root = Path(__file__).resolve().parents[2] / 'web'
+        result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/planning.spec.ts'], cwd=root, env=env, timeout=240, check=False)
+        self.assertEqual(result.returncode, 0, 'Planning browser suite failed.')
+        screenshots = root.parent.parent / '.artifacts' / 'stage9'
+        screenshots.mkdir(parents=True, exist_ok=True)
+        for screenshot in (root / 'test-results').glob('*.png'):
+            shutil.copy2(screenshot, screenshots / screenshot.name)
+
+    def test_turnstile_frontend_against_isolated_api(self):
+        # LiveServerTestCase gives this phase fresh fixtures and rate-limit rows.
+        # Do not raise/disable authentication limits to accommodate suite size.
+        business = Business.objects.create(name='Negocio Turnstile de prueba')
+        user = get_user_model().objects.create_user(
+            username='owner_turnstile', email='owner-turnstile@example.test', password='Browser-test!pass-9274')
+        Membership.objects.create(user=user, business=business, role='OWNER')
+        env = {**os.environ, 'DJANGO_API_URL': self.live_server_url, 'APP_ORIGIN': 'http://127.0.0.1:3100',
+               'E2E_BUSINESS_A': str(business.pk)}
+        root = Path(__file__).resolve().parents[2] / 'web'
         # An isolated provider stub exercises our frontend/backend protocol, not
         # Cloudflare's infrastructure or a production CAPTCHA challenge.
         used_tokens = set()
@@ -105,3 +196,31 @@ class FrontendBrowserTests(LiveServerTestCase):
             result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/turnstile.spec.ts'],
                 cwd=root, env={**env, 'E2E_TURNSTILE': '1'}, timeout=180, check=False)
             self.assertEqual(result.returncode, 0, 'Turnstile integration browser suite failed.')
+    def test_incidents_frontend_against_isolated_api(self):
+        from attendance.services import record_event
+        from attendance.serializers import EventInput
+        from unittest.mock import patch
+        from uuid import uuid4
+        business = Business.objects.create(name='Incidencias de prueba')
+        other = Business.objects.create(name='Otro negocio de incidencias')
+        people = {}
+        for name, role in [('incident_worker', 'EMPLOYEE'), ('incident_owner', 'OWNER')]:
+            user = get_user_model().objects.create_user(username=name, email=f'{name}@example.test', password='Browser-test!pass-9274')
+            Membership.objects.create(user=user, business=business, role=role)
+            employee = Employee.objects.create(business=business, user=user, first_name=name, last_name='Prueba')
+            people[name] = (user, employee)
+        Membership.objects.create(user=people['incident_owner'][0], business=other, role='OWNER')
+        current = datetime.now(ZoneInfo('America/Santiago'))
+        original_time = current - timedelta(hours=2)
+        data = EventInput(data={'event_type':'CLOCK_IN','request_id':str(uuid4()),'session_id':None,'expected_version':0,'location':None,'location_status':'UNAVAILABLE'})
+        data.is_valid(raise_exception=True)
+        with patch('attendance.services.timezone.now', return_value=original_time):
+            event, _ = record_event(people['incident_worker'][0], business.pk, data.validated_data)
+        env = {**os.environ, 'DJANGO_API_URL':self.live_server_url, 'APP_ORIGIN':'http://127.0.0.1:3100', 'E2E_BUSINESS_A':str(business.pk), 'E2E_BUSINESS_B':str(other.pk), 'E2E_INCIDENTS':'1', 'E2E_INCIDENT_SESSION':str(event.session_id), 'E2E_INCIDENT_EVENT':str(event.pk), 'E2E_INCIDENT_DATE':event.session.work_date.isoformat(), 'E2E_DECLARED_TIME':(current-timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')}
+        root = Path(__file__).resolve().parents[2] / 'web'
+        result = subprocess.run(['node', str(root / 'node_modules/@playwright/test/cli.js'), 'test', 'e2e/incidents.spec.ts'], cwd=root, env=env, timeout=240, check=False)
+        self.assertEqual(result.returncode, 0, 'Incidents browser suite failed.')
+        screenshots = root.parent.parent / '.artifacts' / 'stage14'
+        screenshots.mkdir(parents=True, exist_ok=True)
+        for screenshot in (root / 'test-results').glob('*.png'):
+            shutil.copy2(screenshot, screenshots / screenshot.name)

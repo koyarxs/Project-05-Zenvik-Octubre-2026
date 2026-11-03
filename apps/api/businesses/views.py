@@ -17,7 +17,7 @@ class BusinessListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Business.objects.filter(
-            memberships__user=self.request.user, memberships__is_active=True, is_active=True,
+            memberships__user=self.request.user, memberships__is_active=True, memberships__access_enabled=True, is_active=True,
         ).order_by('created_at', 'id')
 
     def perform_create(self, serializer):
@@ -37,7 +37,7 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, BusinessScopedPermission]
 
     def get_queryset(self):
-        queryset = Employee.objects.filter(business=self.business).order_by('created_at', 'id')
+        queryset = Employee.objects.filter(business=self.business).select_related('user').order_by('created_at', 'id')
         if self.membership.role == Membership.Role.EMPLOYEE:
             queryset = queryset.filter(user=self.request.user)
         filters = EmployeeFilterSerializer(data=self.request.query_params)
@@ -48,10 +48,13 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
                 queryset = queryset.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))
         if 'is_active' in values:
             queryset = queryset.filter(is_active=values['is_active'])
-        return queryset
+        if values.get('job_title'):
+            queryset = queryset.filter(job_title__iexact=values['job_title'])
+        order = {'name': ['first_name', 'last_name', 'id'], '-name': ['-first_name', '-last_name', 'id'], 'hire_date': ['hire_date', 'id'], '-hire_date': ['-hire_date', 'id'], 'job_title': ['job_title', 'first_name', 'id'], 'created_at': ['created_at', 'id']}
+        return queryset.order_by(*order[values.get('ordering', 'created_at')])
 
     def get_serializer_context(self):
-        return {**super().get_serializer_context(), 'business': self.business}
+        return {**super().get_serializer_context(), 'business': self.business, 'membership': self.membership, 'employee_memberships': {row.user_id: row for row in Membership.objects.filter(business=self.business)}}
 
     def perform_create(self, serializer):
         serializer.instance = write_employee(

@@ -394,3 +394,63 @@ Cloudflare antes de permitir la operación. CSRF y límites de intentos se conse
 La respuesta GET csrf añade la configuración pública `turnstile`, sin secreto.
 Sin claves reales permanece desactivado en desarrollo. Activación, errores y
 pruebas: [TURNSTILE.md](../../TURNSTILE.md).
+
+
+## Resumen operativo — Etapa 8
+
+`GET /api/v1/businesses/{business_id}/dashboard/` requiere sesión y membresía activa en un negocio activo. Devuelve `date` (Santiago), `active_employees` (null para EMPLOYEE), `today_count`, `week_count`, `pending_count`, `today_shifts` (máximo 6), `upcoming_shifts` (máximo 6, incluye en curso), `pending_requests` (máximo 4, más antiguas primero) y `days` (7 objetos `{date, count}`). Los conteos no se limitan al tamaño de las vistas previas. Los turnos cancelados se excluyen y los nocturnos cuentan en cada día que intersectan.
+
+OWNER/ADMIN reciben el resumen del negocio; EMPLOYEE recibe exclusivamente sus turnos y solicitudes. Los previews de solicitudes incluyen solo `id`, `employee_name`, `request_type`, `start_date` y `end_date`. No se aceptan escrituras, no hay caché HTTP y se devuelve 404 para negocios ajenos, inexistentes o sin acceso vigente. La fecha no se controla mediante parámetros del cliente. Los listados completos continúan disponibles en los endpoints paginados existentes.
+
+## Asistencia personal — Etapa 12
+
+Prefijo `/api/v1/businesses/{business_id}/attendance/`. Sesión Django y membresía activa con acceso habilitado; todas las escrituras requieren CSRF. Producción exige HTTPS. Los registros son propios incluso para OWNER/ADMIN; la política sí puede ser configurada por estos roles.
+
+- `GET current/`: estado, acciones permitidas, jornada actual, turno asociado, política y últimas 50 marcaciones del día local.
+- `POST events/`: `event_type` (CLOCK_IN/BREAK_START/BREAK_END/CLOCK_OUT), `request_id` UUID, `session_id` UUID o null, `expected_version` entero, `location` objeto `{latitude, longitude, accuracy_meters}` o null, `location_status` AVAILABLE/DENIED/UNAVAILABLE/TIMEOUT/UNSUPPORTED/INSECURE, `exception_reason` opcional (máximo 500 caracteres).
+- `GET history/?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD&page=1`: fechas laborales inclusivas, 10 jornadas por página con eventos ordenados.
+- `GET receipts/{uuid}/`: comprobante persistido propio; no expone coordenadas crudas.
+- `GET policy/` y `PUT policy/`: configuración con `expected_version`, `location_required`, `max_accuracy_meters`, `retention_days` (plazo de revisión; null permitido, no activa borrado), `sites` (hasta 20 ubicaciones). Cada sitio admite `id` existente opcional, `name`, `latitude`, `longitude`, `radius_meters`, `is_active`. Un ID ajeno se rechaza. Los sitios omitidos se desactivan, sin borrar evidencia histórica.
+
+Nueva jornada: `session_id=null`, `expected_version=0`, CLOCK_IN. Una jornada abierta se identifica y valida en servidor. El cliente no puede elegir el trabajador ni la hora oficial. Jornada finalizada no admite eventos; una nueva entrada crea otra jornada, explícitamente.
+
+201 devuelve `{receipt, replayed:false}`; repetir clave y contenido devuelve 200 con el mismo evento. Reutilizar la clave con otro contenido, versión obsoleta o transición inválida devuelve 409. 400 valida campos/coordenadas; 403 protege CSRF/rol; 404 no revela recursos ajenos; 429 limita 30 intentos POST por minuto y usuario/negocio. Respuestas `no-store`; sin PATCH/DELETE de eventos.
+
+Si falta la ubicación y la política la exige, el flujo de excepción requiere explicación de al menos 10 caracteres. Estar fuera de geocerca o tener baja precisión genera incidencia y conserva la marcación; no bloquea por distancia. El comprobante distingue resultados INSIDE, OUTSIDE, UNCERTAIN_BOUNDARY, LOW_ACCURACY, NO_GEOFENCE y MISSING_LOCATION.
+
+Arquitectura, seguridad, política de datos, límites, pruebas y matriz normativa: [STAGE-12.md](../../docs/STAGE-12.md). No es una declaración de autorización oficial.
+
+## Supervisión administrativa de asistencia — Etapa 13
+
+Prefijo `/api/v1/businesses/{business_id}/attendance/supervision/`. Todas las operaciones requieren sesión y membresía activa OWNER/ADMIN; EMPLOYEE recibe 403 y negocio/ID ajeno 404. Respuestas no-store, CSRF para escritura.
+
+- GET raíz: listado de trabajadores con última jornada relevante, `summary`, `indicators`, `generated_at`, `timezone`, paginación de 10. Incluye jornada nocturna anterior abierta al consultar hoy.
+- GET `people/{employee_id}/`: jornadas por fecha laboral, eventos por secuencia, revisión/historial, distancias históricas de geocerca y hasta 20 intentos rechazados recientes con conteo total. Sin coordenadas personales exactas.
+- POST `reviews/{session_id}/`: `{state: "PENDING"|"REVIEWING"|"RESOLVED", reason: string de 10–1000 caracteres, expected_review: id previo o 0}`. Crea revisión inmutable (201); versión obsoleta 409. Nunca edita la marcación.
+- GET `reports/`: fechas diarias, semana de lunes a domingo o mes completo; todas las jornadas (incluidas varias por día), más trabajadores sin jornada. Pagina antes de hidratar marcaciones.
+- GET `export/`: CSV UTF-8 BOM, separador `;`, máximo 10.000 filas, prefijos de fórmula neutralizados, metadata y filtros. Sin coordenadas exactas.
+
+Filtros estrictos: `date` YYYY-MM-DD (2000–2100), `period` daily/weekly/monthly, `search` hasta 100 caracteres, `job_title` exacto hasta 120, `state` WORKING/ON_BREAK/FINISHED/LEAVE/PENDING/FUTURE/UNSCHEDULED, `ordering` last_name/-last_name/job_title y `page` positivo. Parámetros desconocidos se rechazan.
+
+Límites por usuario/negocio: 120 peticiones/minuto en supervisión, 12/minuto en reportes/exportaciones. GET de reportes no registra coordenadas ni cambia planificación. Los POST de marcaciones originales ahora conservan conflictos rechazados en AttendanceRejection, sin payload sensible; los replays válidos siguen devolviendo 200 sin duplicar eventos.
+
+Detalle de reglas, migraciones, validación y limitaciones: [STAGE-13.md](../../docs/STAGE-13.md).
+
+## Incidencias, notificaciones y auditoría — Etapa 14
+
+Prefijo `/api/v1/businesses/{business_id}/attendance/`. Sesión, membresía activa, respuestas no-store y CSRF en escrituras. EMPLOYEE consulta únicamente sus solicitudes; OWNER/ADMIN consultan el negocio. No se permite aprobar solicitudes propias. La política puede deshabilitar la revisión de ADMIN; OWNER configura la política.
+
+- `GET/POST incidents/`: lista paginada (10) y creación propia. POST acepta `request_id` UUID, `work_date`, `category`, `reason` (10–1500), `observations` opcional, referencias `session`, `event`, `shift` opcionales, `event_type` y `declared_at` opcionales. Las categorías de olvido exigen hora declarada con offset explícito o Z. No acepta trabajador, GPS ni hora capturada del servidor.
+- `GET incidents/context/?date=YYYY-MM-DD`: jornadas y turnos propios para el formulario, hasta 50 por colección y señal `limited`.
+- `GET incidents/{id}/`: declaración, evidencia original sin coordenadas exactas, turno, indicador de ausencia aprobada, decisiones, ajuste separado y acciones autorizadas. `official_application_enabled=false`.
+- `POST incidents/{id}/transition/`: `{request_id, expected_version, state, reason}`. PENDING admite IN_REVIEW, APPROVED, REJECTED o CANCELLED; IN_REVIEW admite APPROVED o REJECTED. Solo el solicitante cancela una pendiente. Estados finales no admiten nuevas transiciones.
+- `GET incidents/corrections/`: vista paginada de ajustes aprobados con originales conservados, sin modificar reportes ni estado capturado.
+- `GET/PUT incidents/policy/`: PUT exclusivo OWNER con `expected_version`, `request_days` nullable, `admin_review_enabled`, `notifications_enabled`, `exceptional_alerts`, `incomplete_after_minutes` nullable, `categories` (mapa código/nombre) y `review_guidance`.
+- `GET audit/`: exclusivo OWNER/ADMIN, filtros `action`, `resource_type`, `page`; actor, fecha de servidor, recurso y correlación, con datos mínimos del cambio.
+- `GET notifications/`: bandeja del destinatario y negocio, filtros `unread` booleano y `page`, conteo de no leídas. Los avisos administrativos se ocultan si se revoca el rol o acceso.
+- `POST notifications/{id}/read/`: cuerpo vacío; registra una sola primera lectura, sin duplicar efectos.
+- `POST notifications/scan/`: evaluación administrativa de jornadas incompletas según política y fin del turno conservado. Máximo 2/minuto por negocio; sin turno no inventa hora de cierre.
+
+Listados de incidencias/ajustes: `date_from`, `date_to`, `search`, `employee`, `session`, `category`, `status`, `ordering` (created_at/-created_at/work_date/-work_date), `page`. Parámetros y campos desconocidos se rechazan. Creación/decisión idempotentes por UUID y contenido: 201 nueva, 200 repetición exacta, 409 contenido diferente/versión obsoleta/conflicto. 400 validación, 403 rol/CSRF, 404 recurso ajeno. Límite general 120 GET/min y 30 escrituras/min por usuario/negocio/método.
+
+La aprobación produce una corrección inmutable `OPERATIONAL_ONLY`, vinculada a declaración, evidencia y responsable. No reemplaza marcaciones, no inventa GPS, no constituye consolidación oficial. Detalle, resultados y condiciones de activación: [STAGE-14.md](../../docs/STAGE-14.md).

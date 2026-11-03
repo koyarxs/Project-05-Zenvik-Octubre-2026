@@ -1,3 +1,5 @@
+> Actualización Etapa 8 (31-10-2026): el banner, las portadas y el panel duplicado descritos abajo son históricos y ya no se renderizan en Mis negocios. La implementación y validación vigentes están en [docs/STAGE-8.md](docs/STAGE-8.md). Se conservan estos antecedentes de los recursos visuales.
+
 # Mis negocios: diseño y recursos visuales
 
 La pantalla `/app` utiliza el logo de Zenvik en SVG compartido con el acceso, con una variante turquesa sobre el menú azul marino. Los botones principales son azul marino con texto blanco. Las animaciones son breves y respetan `prefers-reduced-motion`.

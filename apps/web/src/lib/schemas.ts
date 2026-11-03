@@ -8,6 +8,11 @@ export const employeeSchema = z.object({
   email: z.union([z.literal(''), z.email('Ingresa un correo válido.')]),
   hire_date: z.union([z.literal(''), z.iso.date('Ingresa una fecha válida.')]),
   is_active: z.boolean(),
+  phone: z.string().trim().max(32).regex(/^[0-9+() .-]*$/, 'Indica un teléfono válido.').optional(),
+  job_title: z.string().trim().max(120).optional(),
+  employee_code: z.string().trim().max(64).optional(),
+  work_schedule: z.string().trim().max(120).optional(),
+  admin_notes: z.string().trim().max(1000).optional(),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

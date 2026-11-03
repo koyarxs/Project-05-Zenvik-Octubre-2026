@@ -7,7 +7,7 @@ async function login(page: Page, user: string) {
   await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
   await expect(page).toHaveURL(/\/app$/);
   await page.goto(`/app/${business}`);
-  await expect(page.getByRole('heading', { name: 'Negocio A de prueba', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: user === 'employee_design' ? 'Hola, Valentina' : 'Negocio A de prueba', exact: true })).toBeVisible();
 }
 test('centro de operaciones, acciones rápidas y navegación contraíble', async ({ page }) => {
   await page.goto('/iniciar-sesion');

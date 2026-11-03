@@ -10,3 +10,5 @@ class OptionalQueryBoolean(serializers.BooleanField):
 class EmployeeFilterSerializer(serializers.Serializer):
     search = serializers.CharField(required=False, allow_blank=True, max_length=150)
     is_active = OptionalQueryBoolean(required=False)
+    job_title = serializers.CharField(required=False, allow_blank=True, max_length=120)
+    ordering = serializers.ChoiceField(choices=['created_at', 'name', '-name', 'hire_date', '-hire_date', 'job_title'], required=False)

@@ -1,0 +1,22 @@
+'use client';
+import { useState } from 'react';
+import { api } from '@/lib/http';
+import type { Policy, Site } from '@/lib/attendance';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Field, ErrorNotice } from './feedback';
+
+export function AttendancePolicyForm({ businessId, initial, onSaved }: { businessId: string; initial: Policy; onSaved: () => void }) {
+  const [required, setRequired] = useState(initial.location_required);
+  const [accuracy, setAccuracy] = useState(initial.max_accuracy_meters);
+  const [retention, setRetention] = useState(initial.retention_days?.toString() ?? '');
+  const [sites, setSites] = useState<Array<Partial<Site>>>(initial.sites);
+  const [busy, setBusy] = useState(false); const [error, setError] = useState('');
+  function edit(index: number, values: Partial<Site>) { setSites(rows => rows.map((row, i) => i === index ? { ...row, ...values } : row)); }
+  return <form className="space-y-5" onSubmit={async event => { event.preventDefault(); if (busy) return; setBusy(true); setError(''); try { await api(`/api/v1/businesses/${businessId}/attendance/policy/`, { method: 'PUT', body: { expected_version: initial.version, location_required: required, max_accuracy_meters: accuracy, retention_days: retention ? Number(retention) : null, sites } }); onSaved(); } catch (failure) { setError(failure instanceof Error ? failure.message : 'No se pudo guardar.'); } finally { setBusy(false); } }}>
+    {error && <ErrorNotice message={error} />}<label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={required} onChange={event => setRequired(event.target.checked)} />Ubicación requerida en el flujo ordinario</label><p className="text-xs leading-6 text-muted-foreground">Sin ubicación, el trabajador puede registrar una excepción con explicación. Estar fuera de una geocerca genera una incidencia; no bloquea la marcación.</p>
+    <Field id="max-accuracy" label="Precisión máxima deseada (metros)"><Input id="max-accuracy" type="number" min={1} max={10000} required value={accuracy} onChange={event => setAccuracy(Number(event.target.value))} /></Field>
+    <Field id="retention" label="Plazo de revisión de conservación (días, opcional)" hint="Define cuándo revisar la conservación. No elimina automáticamente los registros originales; la política legal y el proceso de eliminación auditada deben aprobarse por separado."><Input id="retention" type="number" min={1} max={36500} value={retention} onChange={event => setRetention(event.target.value)} /></Field>
+    <h3 className="text-sm font-bold">Zonas autorizadas</h3>{!sites.length && <p className="text-sm text-muted-foreground">Sin zonas configuradas. Se registra ubicación sin evaluar un perímetro.</p>}{sites.map((site, index) => <fieldset className="space-y-3 rounded-xl border border-border p-4" key={site.id ?? index}><legend className="px-1 text-xs">Ubicación {index + 1}</legend><Field id={`site-name-${index}`} label="Nombre de ubicación"><Input id={`site-name-${index}`} required maxLength={100} value={site.name ?? ''} onChange={event => edit(index, { name: event.target.value })} /></Field><div className="grid grid-cols-2 gap-3"><Field id={`site-lat-${index}`} label="Latitud"><Input id={`site-lat-${index}`} type="number" step="any" min={-90} max={90} required value={site.latitude ?? ''} onChange={event => edit(index, { latitude: event.target.value ? Number(event.target.value) : undefined })} /></Field><Field id={`site-lon-${index}`} label="Longitud"><Input id={`site-lon-${index}`} type="number" step="any" min={-180} max={180} required value={site.longitude ?? ''} onChange={event => edit(index, { longitude: event.target.value ? Number(event.target.value) : undefined })} /></Field></div><Field id={`site-radius-${index}`} label="Radio permitido (metros)"><Input id={`site-radius-${index}`} type="number" min={10} max={100000} required value={site.radius_meters ?? ''} onChange={event => edit(index, { radius_meters: Number(event.target.value) })} /></Field><label className="flex gap-2 text-sm"><input type="checkbox" checked={site.is_active ?? true} onChange={event => edit(index, { is_active: event.target.checked })} />Zona activa</label></fieldset>)}<Button type="button" variant="outline" disabled={sites.length >= 20} onClick={() => setSites(rows => [...rows, { name: '', is_active: true }])}>Agregar ubicación</Button><Button type="submit" className="w-full" disabled={busy}>{busy ? 'Guardando…' : 'Guardar política'}</Button>
+  </form>;
+}
