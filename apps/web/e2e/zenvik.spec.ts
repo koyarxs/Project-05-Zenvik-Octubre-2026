@@ -2,11 +2,21 @@ import { test, expect, type Page } from '@playwright/test';
 const a = process.env.E2E_BUSINESS_A!; const b = process.env.E2E_BUSINESS_B!;
 const password = 'Browser-test!pass-9274';
 async function login(page: Page, username: string) {
-  await page.goto('/iniciar-sesion'); await page.getByLabel('Nombre de usuario', { exact: true }).fill(username); await page.getByLabel('Contraseña', { exact: true }).fill(password); await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click(); await expect(page).toHaveURL(/\/app$/);
+  await page.goto('/iniciar-sesion'); await page.getByLabel('Nombre de usuario', { exact: true }).fill(username); await page.getByLabel('Contraseña', { exact: true }).fill(password); await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click(); await expect(page).toHaveURL(/\/app(?:\/[^/]+)?$/);
+  if (new URL(page.url()).pathname !== '/app') await page.goto('/app');
 }
 test('registro, negocio, trabajador, edición, persistencia y cierre de sesión', async ({ page }) => {
   await page.goto('/registrarse');
-  await page.getByLabel('Nombre de usuario', { exact: true }).fill('browser_registration'); await page.getByLabel('Correo electrónico', { exact: true }).fill('browser-registration@example.com'); await page.getByLabel('Contraseña', { exact: true }).fill(password); await page.getByRole('button', { name: 'Crear mi cuenta' }).click();
+  await page.getByLabel('Nombres', { exact: true }).fill('Ana');
+  await page.getByLabel('Apellidos', { exact: true }).fill('Prueba');
+  await page.getByLabel('Nombre de usuario', { exact: true }).fill('browser_registration'); await page.getByLabel('Correo electrónico', { exact: true }).fill('browser-registration@example.com'); await page.getByLabel('Contraseña', { exact: true }).fill(password);
+  await page.getByLabel('Repetir contraseña', { exact: true }).fill(password + 'x');
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await expect(page.getByText('Las contraseñas no coinciden.')).toBeVisible();
+  await page.getByLabel('Repetir contraseña', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('button', { name: 'Configurar más tarde' }).click();
+  await page.getByRole('button', { name: 'Crear mi cuenta' }).click();
   await expect(page.getByText('Tu cuenta está lista')).toBeVisible(); await login(page, 'browser_registration');
   await expect(page.getByText('Tu primer negocio empieza aquí')).toBeVisible();
   await page.getByRole('link', { name: 'Registrar mi primer negocio' }).click(); await page.getByLabel('Nombre comercial').fill('Negocio creado en navegador'); await page.getByRole('button', { name: 'Registrar negocio', exact: true }).click();

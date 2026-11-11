@@ -23,6 +23,6 @@ describe('supervisión administrativa', () => {
   it('presenta vacío real y resumen sin porcentajes', () => {
     vi.mocked(useResource).mockReturnValue({ data: { count: 0, results: [], summary: { WORKING: 3 }, generated_at: '2026-11-02T15:00:00Z' }, error: undefined, retry: vi.fn() });
     expect(renderToStaticMarkup(<AttendanceSupervision business={business} />)).toContain('No hay registros para estos filtros');
-    expect(renderToStaticMarkup(<AttendanceSummary business={business} />)).toContain('Trabajando: 3');
+    expect(renderToStaticMarkup(<AttendanceSummary business={business} />)).toContain('Trabajando<strong>3</strong>');
   });
 });

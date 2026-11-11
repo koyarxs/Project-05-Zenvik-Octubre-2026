@@ -4,7 +4,7 @@ import { useResource } from './use-resource';
 import type { TurnstileConfig } from '@/lib/turnstile';
 
 export function useTurnstile() {
-  const resource = useResource<{ turnstile: TurnstileConfig }>('/api/v1/auth/csrf/');
+  const resource = useResource<{ turnstile: TurnstileConfig; registrationEmailRequired?: boolean }>('/api/v1/auth/csrf/');
   const [token, setToken] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const receiveToken = useCallback((value: string | null) => setToken(value), []);
@@ -17,5 +17,6 @@ export function useTurnstile() {
     if (!ready) throw new Error('Completa la verificación de seguridad antes de continuar.');
     return config?.enabled ? { turnstile_token: token! } : {};
   }
-  return { config, error, ready, version, receiveToken, reset, payload, retry: resource.retry };
+  return { config, error, ready, version, receiveToken, reset, payload, retry: resource.retry,
+    registrationEmailRequired: resource.data?.registrationEmailRequired === true };
 }

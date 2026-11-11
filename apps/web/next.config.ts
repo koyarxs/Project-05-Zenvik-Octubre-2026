@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 const deployment = process.env.APP_ORIGIN?.startsWith('https://') ?? false;
 const config: NextConfig = {
+  output: process.env.NEXT_STANDALONE === 'true' ? 'standalone' : undefined,
+  images: { qualities: [75, 85] },
   poweredByHeader: false,
   async headers() {
     return [{ source: '/:path*', headers: [

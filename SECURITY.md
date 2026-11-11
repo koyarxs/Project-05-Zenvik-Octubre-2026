@@ -1,5 +1,7 @@
 # Zenvik — auditoría local de seguridad, etapa 7
 
+Actualización de infraestructura del 5-11-2026: ver [STAGE-16](docs/STAGE-16.md) para auditorías actuales de dependencias/contenedores, configuración de proxies y pruebas de roles/restauración. Los resultados siguientes son históricos de etapa 7. La preparación local no resuelve por sí sola TLS, backups externos, alertas o privilegios de una futura instalación real.
+
 Fecha: 29-10-2026. Evaluación: **NO APTO para despliegue comercial público todavía**.
 La aplicación supera la regresión funcional y las pruebas locales de aislamiento;
 faltan controles operativos y un entorno de despliegue verificable. Puede continuar

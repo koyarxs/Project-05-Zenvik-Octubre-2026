@@ -1,0 +1,50 @@
+.section { position: relative; overflow: hidden; background: #fff; color: #11213a; border-top: 1px solid #fff0e4; border-bottom: 1px solid #fff0e4; }
+.inner { max-width: 1280px; margin: auto; padding: 85px 0 65px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 55px; align-items: center; }
+.copy { position: relative; z-index: 3; }
+.kicker { color: #cb4800; font-size: 12px; font-weight: 600; margin: 0 0 20px; }
+.copy h2 { font-size: 58px; line-height: 1.06; margin: 0 0 25px; font-weight: 700; letter-spacing: -.055em; }
+.copy h2 em { color: #ed5900; font-style: normal; }
+.intro { color: #596476; font-size: 15px; line-height: 1.8; max-width: 380px; margin: 0 0 30px; }
+.selector { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-bottom: 29px; max-width: 495px; }
+.selector button { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding: 19px 14px; text-align: left; border: 1px solid #e8eaf0; border-radius: 12px; background: #fff; color: #3b495e; cursor: pointer; transition: border-color .2s,background .2s; }
+.selector button > svg { color: #ed6307; }
+.selector button > span { display: grid; gap: 7px; }
+.selector strong { font-size: 13px; font-weight: 650; color: #12233b; }
+.selector button > span > span { font-size: 10px; line-height: 1.6; color: #6c7687; }
+.selector button[aria-selected=true] { border-color: #f9ad76; background: #fffaf5; }
+.selector button:hover { border-color: #e98a45; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.cta { display: inline-flex; align-items: center; justify-content: center; gap: 19px; color: #fff; font-size: 11px; font-weight: 600; background: #cc4700; padding: 13px 17px; border-radius: 7px; }
+.cta:hover { background: #af3b00; }
+.stores { display: flex; gap: 9px; }
+.store { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid #d8dde5; border-radius: 7px; color: #182336; background: #fff; }
+.store svg { width: 22px; height: 24px; flex-shrink: 0; }
+.store > span { display: flex; flex-direction: column; line-height: 1.25; }
+.store small { font-size: 7px; color: #6a7484; }
+.store strong { font-size: 13px; font-weight: 600; letter-spacing: -.03em; }
+.access { font-size: 10px; color: #788393; margin: 18px 0 0; }
+.visual { position: relative; min-width: 0; padding: 20px 0 0; }
+.orbit { position: absolute; width: 525px; height: 525px; border-radius: 50%; top: 50px; left: 2px; background: linear-gradient(135deg,#ffd3a1,#ff9c3c 55%,#ff7425); }
+.orbit::after { content: ''; position: absolute; width: 120px; height: 120px; border-radius: 50%; top: -35px; right: -17px; border: 1px solid #ffd5b6; }
+.devices { position: relative; height: 590px; }
+.panel { position: absolute; left: 30px; top: 0; z-index: 2; transform: rotate(-5deg); }
+.panel[hidden] { display: none; }
+.phone { width: 272px; height: 558px; padding: 5px; border-radius: 41px; background: linear-gradient(110deg,#c4bfb9,#44403e 23%,#b7afaa 70%,#e6e0da); border: 1px solid #9e9692; box-shadow: 0 22px 35px #472b201c, inset 0 0 0 1px #c2bbb4; position: relative; }
+.phoneInner { height: 100%; background: #fff; border: 3px solid #161719; border-radius: 35px; overflow: hidden; display: flex; flex-direction: column; }
+.sideKey { position: absolute; right: -3px; top: 127px; height: 51px; width: 2px; border-radius: 2px; background: #9b938d; }
+.status { display: flex; align-items: center; justify-content: space-between; padding: 13px 17px 10px; color: #0f2036; background: #fff; font-size: 9px; line-height: 1; font-weight: 700; position: relative; }
+.status > span:last-child { display: flex; align-items: center; gap: 3px; }
+.status > i { height: 16px; width: 62px; background: #101720; border-radius: 15px; position: absolute; top: 8px; left: calc(50% - 31px); }
+.browser { display: flex; align-items: center; justify-content: center; gap: 6px; background: #f4f6f9; color: #5e6b80; font-size: 8px; padding: 8px 14px; border-top: 1px solid #edf0f5; border-bottom: 1px solid #e1e6f0; }
+.browser > span:last-child { margin-left: auto; }.browser > svg { margin-left: auto; }
+.screen { flex: 1; overflow-y: auto; overscroll-behavior: contain; min-height: 0; background: #f5f8ff; scrollbar-width: thin; scrollbar-color: #c7d6ef transparent; }
+.screen img { display: block; width: 100%; height: auto; }
+.homeIndicator { height: 17px; flex-shrink: 0; display: grid; place-items: center; background: white; }
+.homeIndicator > span { width: 85px; height: 3px; border-radius: 3px; background: #172132; }
+.secondary { position: absolute; left: 260px; top: 56px; transform: rotate(10deg) scale(.9); box-shadow: 0 16px 30px #472b201c; pointer-events: none; }
+.caption { margin: 12px 0 0; font-size: 9px; color: #87909d; text-align: center; position: relative; }
+.section :focus-visible { outline: 2px solid #d64d00; outline-offset: 5px; }
+@media (max-width:1350px) { .inner { margin: 0 40px; gap: 35px; } .copy h2 { font-size: 50px; } .panel { left: 0; } .secondary { left: 200px; } .orbit { left: -15px; width: 475px; height: 475px; } }
+@media (max-width:1000px) { .inner { grid-template-columns: 1.05fr 1fr; margin: 0 30px; padding: 65px 0; gap: 23px; } .copy h2 { font-size: 39px; } .intro { font-size: 13px; } .phone { width: 235px; height: 490px; } .secondary { left: 150px; top: 60px; } .devices { height: 535px; } .orbit { width: 380px; height: 380px; top: 80px; } .selector { gap: 7px; }.selector button { padding: 14px 9px; gap: 12px; } .selector strong { font-size: 11px; } .selector button > span > span { font-size: 9px; } .stores { gap: 7px; } }
+@media (max-width:700px) { .inner { grid-template-columns: 1fr; margin: 0 23px; padding: 48px 0 35px; gap: 35px; } .copy h2 { font-size: 42px; } .intro { max-width: 350px; } .selector { max-width: none; gap: 9px; margin-bottom: 23px; } .selector button { padding: 16px 12px; } .selector strong { font-size: 12px; } .selector button > span > span { font-size: 10px; } .actions { gap: 15px; } .store { padding: 7px 10px; } .visual { width: 100%; max-width: 390px; margin: auto; padding-top: 20px; } .panel { left: calc(50% - 145px); transform: rotate(-4deg); } .phone { width: 230px; height: 485px; } .secondary { left: calc(50% - 10px); transform: rotate(9deg) scale(.85); top: 55px; } .devices { height: 525px; } .orbit { width: 330px; height: 330px; left: calc(50% - 165px); top: 82px; } .caption { margin-top: 4px; } }
+@media (prefers-reduced-motion:reduce) { .selector button { transition: none; } }

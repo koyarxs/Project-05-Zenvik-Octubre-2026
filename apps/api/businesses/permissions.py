@@ -18,4 +18,8 @@ class BusinessScopedPermission(BasePermission):
         membership = active_membership(request.user, view.kwargs['business_id'])
         view.membership = membership
         view.business = membership.business
-        return request.method in SAFE_METHODS or membership.role in MANAGER_ROLES
+        allowed = request.method in SAFE_METHODS or membership.role in MANAGER_ROLES
+        if allowed:
+            from billing.access import guard_request
+            guard_request(request, view.business)
+        return allowed

@@ -22,6 +22,8 @@ class AttendancePermission(BasePermission):
     def has_permission(self, request, view):
         view.member = active_membership(request.user, view.kwargs['business_id'])
         view.business = view.member.business
+        from billing.access import guard_request
+        guard_request(request, view.business)
         if settings.PRODUCTION and not request.is_secure():
             raise PermissionDenied('Asistencia requiere una conexión HTTPS segura.')
         return True
@@ -55,7 +57,7 @@ class CurrentView(AttendanceBase):
         zone = ZoneInfo(self.business.planning_timezone)
         day_start = datetime.combine(today, time.min, tzinfo=zone)
         day_end = datetime.combine(today + timedelta(days=1), time.min, tzinfo=zone)
-        today_events = AttendanceEvent.objects.filter(business=self.business, actor=request.user, recorded_at__gte=day_start, recorded_at__lt=day_end).order_by('-recorded_at', '-sequence')
+        today_events = AttendanceEvent.objects.filter(business=self.business, actor=request.user, recorded_at__gte=day_start, recorded_at__lt=day_end).select_related('session').order_by('-recorded_at', '-sequence')
         return Response({'server_now': now.isoformat(), 'date': today.isoformat(), 'timezone': self.business.planning_timezone,
             'employee_name': str(person) if person else None, 'eligible': bool(person and person.is_active), 'state': state,
             'allowed_actions': allowed, 'session': SessionRead(current).data if current else None,
@@ -93,7 +95,7 @@ class HistoryView(AttendanceBase):
 
 class ReceiptView(AttendanceBase):
     def get(self, request, pk, **kwargs):
-        event = get_object_or_404(AttendanceEvent, pk=pk, business=self.business, actor=request.user)
+        event = get_object_or_404(AttendanceEvent.objects.select_related('session'), pk=pk, business=self.business, actor=request.user)
         return Response(EventRead(event).data)
 
 

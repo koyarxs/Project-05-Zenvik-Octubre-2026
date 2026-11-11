@@ -1,0 +1,3115 @@
+[
+  {
+    "name": "Tarapacá",
+    "communes": [
+      {
+        "name": "Alto Hospicio",
+        "places": [
+          "Alto Hospicio",
+          "La Mula"
+        ]
+      },
+      {
+        "name": "Camiña",
+        "places": [
+          "Camiña"
+        ]
+      },
+      {
+        "name": "Colchane",
+        "places": []
+      },
+      {
+        "name": "Huara",
+        "places": [
+          "Huara"
+        ]
+      },
+      {
+        "name": "Iquique",
+        "places": [
+          "Alto Los Verdes",
+          "Altos de Playa Blanca",
+          "Chanavayita",
+          "Iquique"
+        ]
+      },
+      {
+        "name": "Pica",
+        "places": [
+          "Matilla",
+          "Pica"
+        ]
+      },
+      {
+        "name": "Pozo Almonte",
+        "places": [
+          "Baquedano",
+          "La Huayca",
+          "La Tirana",
+          "Pozo Almonte"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Antofagasta",
+    "communes": [
+      {
+        "name": "Antofagasta",
+        "places": [
+          "Antofagasta",
+          "Cerro Moreno",
+          "Coloso"
+        ]
+      },
+      {
+        "name": "Calama",
+        "places": [
+          "Calama",
+          "Quebrada Seca",
+          "Villa Pampa Verde"
+        ]
+      },
+      {
+        "name": "María Elena",
+        "places": [
+          "María Elena"
+        ]
+      },
+      {
+        "name": "Mejillones",
+        "places": [
+          "Mejillones"
+        ]
+      },
+      {
+        "name": "Ollagüe",
+        "places": []
+      },
+      {
+        "name": "San Pedro de Atacama",
+        "places": [
+          "San Pedro de Atacama",
+          "Toconao"
+        ]
+      },
+      {
+        "name": "Sierra Gorda",
+        "places": [
+          "Baquedano",
+          "Sierra Gorda"
+        ]
+      },
+      {
+        "name": "Taltal",
+        "places": [
+          "Taltal"
+        ]
+      },
+      {
+        "name": "Tocopilla",
+        "places": [
+          "Tocopilla"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Atacama",
+    "communes": [
+      {
+        "name": "Alto del Carmen",
+        "places": [
+          "Alto del Carmen",
+          "El Tránsito"
+        ]
+      },
+      {
+        "name": "Caldera",
+        "places": [
+          "Caldera",
+          "Pulpo y Pulpito"
+        ]
+      },
+      {
+        "name": "Chañaral",
+        "places": [
+          "Barquito",
+          "Chañaral",
+          "El Salado"
+        ]
+      },
+      {
+        "name": "Copiapó",
+        "places": [
+          "Copiapó",
+          "Paipote",
+          "San Pedro"
+        ]
+      },
+      {
+        "name": "Diego de Almagro",
+        "places": [
+          "Diego de Almagro",
+          "El Salvador"
+        ]
+      },
+      {
+        "name": "Freirina",
+        "places": [
+          "Freirina",
+          "Maitencillo",
+          "Vicuña Mackenna"
+        ]
+      },
+      {
+        "name": "Huasco",
+        "places": [
+          "Huasco",
+          "Huasco Bajo"
+        ]
+      },
+      {
+        "name": "Tierra Amarilla",
+        "places": [
+          "Los Loros",
+          "Nantoco",
+          "Tierra Amarilla"
+        ]
+      },
+      {
+        "name": "Vallenar",
+        "places": [
+          "Buena Esperanza",
+          "Domeyko",
+          "Quebrada El Jilguero",
+          "Vallenar"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Coquimbo",
+    "communes": [
+      {
+        "name": "Andacollo",
+        "places": [
+          "Andacollo"
+        ]
+      },
+      {
+        "name": "Canela",
+        "places": [
+          "Canela Alta",
+          "Canela Baja",
+          "Huentelauquén Norte",
+          "Huentelauquén Sur"
+        ]
+      },
+      {
+        "name": "Combarbalá",
+        "places": [
+          "Cogotí 18",
+          "Combarbalá",
+          "La Ligua",
+          "Quilitapia",
+          "San Marcos"
+        ]
+      },
+      {
+        "name": "Coquimbo",
+        "places": [
+          "Cerrillos",
+          "Coquimbo",
+          "Cruz de Caña",
+          "El Carmen - Venus",
+          "El Peñón",
+          "Esfuerzo Campesino",
+          "Guanaqueros",
+          "Huachalalume",
+          "Nueva Vida",
+          "Padre Hurtado",
+          "Tongoy",
+          "Totoralillo",
+          "Tres Villas",
+          "Triunfo Campesino"
+        ]
+      },
+      {
+        "name": "Illapel",
+        "places": [
+          "Asiento Viejo",
+          "Illapel",
+          "Las Cañas I",
+          "Las Cañas Ii"
+        ]
+      },
+      {
+        "name": "La Higuera",
+        "places": [
+          "Caleta Hornos",
+          "Chungungo",
+          "El Trapiche",
+          "La Higuera",
+          "Punta Colorada",
+          "Punta de Choros"
+        ]
+      },
+      {
+        "name": "La Serena",
+        "places": [
+          "Algarrobito",
+          "Altovalsol",
+          "Bellavista",
+          "Caleta San Pedro",
+          "Colinas del Romero Sur",
+          "Coquimbito Oriente",
+          "El Rosario",
+          "Gabriela Mistral",
+          "Huachalalume",
+          "Islón",
+          "La Serena",
+          "Lambert",
+          "Las Rojas",
+          "Pelícana",
+          "Quebrada de Talca",
+          "Santa Elisa Norte",
+          "Serena Golf",
+          "Serena Golf Sur"
+        ]
+      },
+      {
+        "name": "Los Vilos",
+        "places": [
+          "Caimanes",
+          "Guangualí",
+          "Los Vilos",
+          "Pichidangui",
+          "Quilimarí"
+        ]
+      },
+      {
+        "name": "Monte Patria",
+        "places": [
+          "Carén",
+          "Chañaral Alto",
+          "Chilecito",
+          "El Palqui",
+          "El Tome Alto",
+          "Huana",
+          "Huatulame",
+          "Juntas",
+          "Monte Patria",
+          "Tulahuén",
+          "Villa El Palqui"
+        ]
+      },
+      {
+        "name": "Ovalle",
+        "places": [
+          "Carachilla",
+          "Cerrillos de Tamaya",
+          "El Trapiche",
+          "Estación Recoleta",
+          "Huamalata",
+          "La Chimba - Los Leices",
+          "La Torre",
+          "Lagunillas",
+          "Limarí",
+          "Los Nogales",
+          "Los Olivos",
+          "Nueva Aurora",
+          "Ovalle",
+          "San Julián",
+          "Sotaquí",
+          "Unión Campesina"
+        ]
+      },
+      {
+        "name": "Paihuano",
+        "places": [
+          "Paihuano",
+          "Pisco Elqui"
+        ]
+      },
+      {
+        "name": "Punitaqui",
+        "places": [
+          "Las Ramadas",
+          "Punitaqui"
+        ]
+      },
+      {
+        "name": "Río Hurtado",
+        "places": [
+          "Pichasca",
+          "Samo Alto",
+          "Serón"
+        ]
+      },
+      {
+        "name": "Salamanca",
+        "places": [
+          "Chillepín",
+          "Coirón",
+          "Cuncumén",
+          "El Tambo",
+          "Panguecillo",
+          "Quelén Bajo",
+          "Salamanca",
+          "Tahuinco",
+          "Tranquilla"
+        ]
+      },
+      {
+        "name": "Vicuña",
+        "places": [
+          "Andacollito",
+          "Diaguitas",
+          "Gualliguaica",
+          "La Calera",
+          "Lourdes",
+          "Marquesa",
+          "Nueva Talcuna",
+          "Rivadavia",
+          "San Isidro",
+          "Vicuña",
+          "Villa Puclaro",
+          "Villaseca"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Valparaíso",
+    "communes": [
+      {
+        "name": "Algarrobo",
+        "places": [
+          "Algarrobo",
+          "El Yeco",
+          "Mirasol"
+        ]
+      },
+      {
+        "name": "Cabildo",
+        "places": [
+          "Artificio",
+          "Cabildo",
+          "La Rinconada",
+          "La Vega",
+          "La Viña"
+        ]
+      },
+      {
+        "name": "Calera",
+        "places": [
+          "La Calera",
+          "Las Cabritas",
+          "Pachacama",
+          "Pachacamita"
+        ]
+      },
+      {
+        "name": "Calle Larga",
+        "places": [
+          "Alto Puerto-San Francisco",
+          "Calle Larga",
+          "La Caldera",
+          "Los Andes",
+          "Valle Alegre"
+        ]
+      },
+      {
+        "name": "Cartagena",
+        "places": [
+          "Cartagena",
+          "Lo Abarca"
+        ]
+      },
+      {
+        "name": "Casablanca",
+        "places": [
+          "Casablanca",
+          "La Playa",
+          "La Playa Sur",
+          "La Vinilla Norte",
+          "Lagunillas",
+          "Quintay"
+        ]
+      },
+      {
+        "name": "Catemu",
+        "places": [
+          "Catemu",
+          "El Cobre",
+          "El Seco Alto",
+          "El Ñilhue",
+          "Las Varillas",
+          "Los Cerrillos",
+          "Reinoso",
+          "San José",
+          "Santa Margarita"
+        ]
+      },
+      {
+        "name": "Concón",
+        "places": [
+          "Concón",
+          "Cumbres de Concón",
+          "Fuerte Aguayo Norte",
+          "Ojos de Agua",
+          "Villa Independencia"
+        ]
+      },
+      {
+        "name": "El Quisco",
+        "places": [
+          "El Quisco"
+        ]
+      },
+      {
+        "name": "El Tabo",
+        "places": [
+          "El Tabo",
+          "Las Cruces"
+        ]
+      },
+      {
+        "name": "Hijuelas",
+        "places": [
+          "Calle Chépica",
+          "El Retiro - Los Pinos",
+          "Hijuelas",
+          "Hijuelas Sur",
+          "La Febre",
+          "La Sombra",
+          "Rabuco"
+        ]
+      },
+      {
+        "name": "Isla de Pascua",
+        "places": [
+          "Hanga Roa"
+        ]
+      },
+      {
+        "name": "Juan Fernández",
+        "places": [
+          "San Juan Bautista"
+        ]
+      },
+      {
+        "name": "La Cruz",
+        "places": [
+          "La Cruz"
+        ]
+      },
+      {
+        "name": "La Ligua",
+        "places": [
+          "El Carmen",
+          "El Trapiche",
+          "Huaquén",
+          "La Canela",
+          "La Higuera",
+          "La Ligua",
+          "Las Parcelas de Longotoma",
+          "Los Molles",
+          "Los Quinquelles",
+          "Pichicuy",
+          "Placilla",
+          "Puyancon",
+          "Valle Hermoso"
+        ]
+      },
+      {
+        "name": "Limache",
+        "places": [
+          "La Victoria",
+          "Las Cruces",
+          "Limache",
+          "Lliu-Lliu",
+          "Tabolango"
+        ]
+      },
+      {
+        "name": "Llaillay",
+        "places": [
+          "El Porvenir",
+          "Las Peñas",
+          "Llaillay",
+          "Los Loros",
+          "Santa Rosa",
+          "Villa El Amanecer"
+        ]
+      },
+      {
+        "name": "Los Andes",
+        "places": [
+          "Cerro Alto Los Leones",
+          "El Sauce",
+          "Las Vizcachas",
+          "Los Andes",
+          "Los Chacayes",
+          "Río Blanco Carretera",
+          "San Rafael"
+        ]
+      },
+      {
+        "name": "Nogales",
+        "places": [
+          "El Melón",
+          "La Peña",
+          "Nogales"
+        ]
+      },
+      {
+        "name": "Olmué",
+        "places": [
+          "Las Cruces",
+          "Olmué",
+          "Quebrada Alvarado"
+        ]
+      },
+      {
+        "name": "Panquehue",
+        "places": [
+          "El Escorial",
+          "El Mirador",
+          "Lo Campo",
+          "Panquehue",
+          "Panquehue Sur"
+        ]
+      },
+      {
+        "name": "Papudo",
+        "places": [
+          "Campomar Papudo",
+          "Papudo",
+          "Pullally"
+        ]
+      },
+      {
+        "name": "Petorca",
+        "places": [
+          "Chincolco",
+          "Chincolco Norte",
+          "El Valle",
+          "Hierro Viejo",
+          "La Ñipa",
+          "Pedegua",
+          "Petorca",
+          "Santa Julia"
+        ]
+      },
+      {
+        "name": "Puchuncaví",
+        "places": [
+          "Campiche",
+          "Las Ventanas",
+          "Maitencillo",
+          "Puchuncaví"
+        ]
+      },
+      {
+        "name": "Putaendo",
+        "places": [
+          "Dieciocho de Septiembre",
+          "Granalla Norte",
+          "La Cancha-Manantiales",
+          "La Orilla",
+          "Las Compuertas",
+          "Patagual de Guzmanes",
+          "Putaendo",
+          "Putaendo Norte",
+          "Quebrada de Herrera",
+          "San José de Piguchén"
+        ]
+      },
+      {
+        "name": "Quillota",
+        "places": [
+          "Las Pataguas",
+          "Las Pataguas Norte",
+          "Quillota",
+          "San Pedro"
+        ]
+      },
+      {
+        "name": "Quilpué",
+        "places": [
+          "Quilpué"
+        ]
+      },
+      {
+        "name": "Quintero",
+        "places": [
+          "Loncura",
+          "Mirador Santa Luisa",
+          "Quintero",
+          "Santa Adela Oriente"
+        ]
+      },
+      {
+        "name": "Rinconada",
+        "places": [
+          "Los Villares",
+          "Rinconada",
+          "Tierras Blancas"
+        ]
+      },
+      {
+        "name": "San Antonio",
+        "places": [
+          "Aguas Buenas",
+          "Leyda",
+          "Lo Gallardo",
+          "San Antonio"
+        ]
+      },
+      {
+        "name": "San Esteban",
+        "places": [
+          "El Higueral Norte",
+          "El Higueral Sur",
+          "Las Golondrinas",
+          "Lo Calvo",
+          "Los Chacayes",
+          "Los Llanos Altos",
+          "San Esteban"
+        ]
+      },
+      {
+        "name": "San Felipe",
+        "places": [
+          "Algarrobal",
+          "Bellavista",
+          "Bucalemu",
+          "Calle El Río",
+          "Curimón",
+          "El Asiento",
+          "Los Villares",
+          "Punta El Olivo",
+          "Quebrada de Herrera",
+          "San Felipe",
+          "San Rafael",
+          "Tierras Blancas"
+        ]
+      },
+      {
+        "name": "Santa María",
+        "places": [
+          "El Llano",
+          "Las Cabras",
+          "Lo Galdámez-La Higuera",
+          "Santa Filomena-El Llano",
+          "Santa María",
+          "Tocornal Oriente",
+          "Villa Los Almendros"
+        ]
+      },
+      {
+        "name": "Santo Domingo",
+        "places": [
+          "Santo Domingo"
+        ]
+      },
+      {
+        "name": "Valparaíso",
+        "places": [
+          "Laguna Verde",
+          "Placilla de Peñuelas",
+          "Valparaíso"
+        ]
+      },
+      {
+        "name": "Villa Alemana",
+        "places": [
+          "Villa Alemana"
+        ]
+      },
+      {
+        "name": "Viña del Mar",
+        "places": [
+          "Viña del Mar"
+        ]
+      },
+      {
+        "name": "Zapallar",
+        "places": [
+          "Catapilco",
+          "La Laguna de Zapallar",
+          "Zapallar - Cachagua"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Libertador General Bernardo O'Higgins",
+    "communes": [
+      {
+        "name": "Chimbarongo",
+        "places": [
+          "Chimbarongo",
+          "Codegua",
+          "El Rincón",
+          "La Chipana Huemul",
+          "La Cuesta",
+          "La Lucana",
+          "Peor Es Nada",
+          "Quicharco",
+          "San Enrique de Romeral",
+          "San Juan de La Sierra-San Antonio",
+          "Tinguiririca"
+        ]
+      },
+      {
+        "name": "Chépica",
+        "places": [
+          "Auquinco",
+          "Chépica",
+          "La Mina",
+          "Las Arañas",
+          "Paredones de Auquinco",
+          "Rinconada de Navarro"
+        ]
+      },
+      {
+        "name": "Codegua",
+        "places": [
+          "Codegua",
+          "El Carmen",
+          "La Blanquina",
+          "La Compañía",
+          "La Morera"
+        ]
+      },
+      {
+        "name": "Coinco",
+        "places": [
+          "Coinco",
+          "Copequén",
+          "El Rulo"
+        ]
+      },
+      {
+        "name": "Coltauco",
+        "places": [
+          "Coltauco-Almendro-Parral",
+          "Cuesta Idahue",
+          "Lo Ulloa",
+          "Lo de Cuevas",
+          "Loreto - Molino",
+          "Monte Grande Arriba",
+          "Purén",
+          "Rinconada de Idahue",
+          "Rinconada de Parral",
+          "San Luis"
+        ]
+      },
+      {
+        "name": "Doñihue",
+        "places": [
+          "California",
+          "Doñihue-Cerrillos",
+          "Lo Miranda",
+          "Plazuela",
+          "Rinconada de Doñihue"
+        ]
+      },
+      {
+        "name": "Graneros",
+        "places": [
+          "Graneros",
+          "La Compañía",
+          "Nuevos Campos"
+        ]
+      },
+      {
+        "name": "La Estrella",
+        "places": [
+          "La Estrella"
+        ]
+      },
+      {
+        "name": "Las Cabras",
+        "places": [
+          "Cocalán",
+          "El Carmen",
+          "El Manzano",
+          "La Cebada",
+          "Las Cabras",
+          "Llallauquén",
+          "Santa Inés-Santa Clarisa"
+        ]
+      },
+      {
+        "name": "Litueche",
+        "places": [
+          "Litueche"
+        ]
+      },
+      {
+        "name": "Lolol",
+        "places": [
+          "Lolol"
+        ]
+      },
+      {
+        "name": "Machalí",
+        "places": [
+          "Coya",
+          "Machalí"
+        ]
+      },
+      {
+        "name": "Malloa",
+        "places": [
+          "Caracoles",
+          "Corcolén",
+          "Limahue",
+          "Malloa",
+          "Panquehue",
+          "Pelequén",
+          "Puntilla de Panquehue"
+        ]
+      },
+      {
+        "name": "Marchihue",
+        "places": [
+          "Marchihue",
+          "Rinconada de Alcones"
+        ]
+      },
+      {
+        "name": "Mostazal",
+        "places": [
+          "Angostura",
+          "O'Higgins de Pilai",
+          "Peuco",
+          "San Francisco de Mostazal",
+          "Sector Cordillera"
+        ]
+      },
+      {
+        "name": "Nancagua",
+        "places": [
+          "Cunaco",
+          "Nancagua",
+          "Puquillay Alto",
+          "Puquillay Bajo",
+          "San Gregorio"
+        ]
+      },
+      {
+        "name": "Navidad",
+        "places": [
+          "La Boca",
+          "La Vega de Pupuya",
+          "Navidad",
+          "Rapel"
+        ]
+      },
+      {
+        "name": "Olivar",
+        "places": [
+          "Calle Angosta",
+          "El Bajo",
+          "Gultro",
+          "La Hacienda",
+          "Olivar Alto",
+          "Olivar Bajo"
+        ]
+      },
+      {
+        "name": "Palmilla",
+        "places": [
+          "El Tambo",
+          "Las Majadas",
+          "Los Maquis",
+          "Palmilla",
+          "Rinconada de Palmilla",
+          "San Francisco del Huique",
+          "San José del Carmen",
+          "San Rafael",
+          "Santa Irene-Santa Matilde",
+          "Talhuén",
+          "Valle Hermoso"
+        ]
+      },
+      {
+        "name": "Paredones",
+        "places": [
+          "Bucalemu",
+          "Paredones"
+        ]
+      },
+      {
+        "name": "Peralillo",
+        "places": [
+          "Peralillo",
+          "Población"
+        ]
+      },
+      {
+        "name": "Peumo",
+        "places": [
+          "La Esperanza - El Cortijo",
+          "Peumo",
+          "Punta de Diamante",
+          "Rosario Codao Carretera"
+        ]
+      },
+      {
+        "name": "Pichidegua",
+        "places": [
+          "Cerro Pataguas",
+          "El Caleuche",
+          "La Torina",
+          "Larmahue",
+          "Lo Argentina",
+          "Pataguas Orilla 1",
+          "Pataguas Orilla 2",
+          "Pataguas Orilla 3",
+          "Pichidegua",
+          "Portezuelo de Larmahue",
+          "San José de Marchihue",
+          "San Roberto",
+          "Santa Amelia"
+        ]
+      },
+      {
+        "name": "Pichilemu",
+        "places": [
+          "Cáhuil",
+          "Pichilemu"
+        ]
+      },
+      {
+        "name": "Placilla",
+        "places": [
+          "La Tuna",
+          "Placilla",
+          "Rinconada de Manantiales",
+          "San José de Peñuelas"
+        ]
+      },
+      {
+        "name": "Pumanque",
+        "places": [
+          "Nilahue Cornejo",
+          "Pumanque"
+        ]
+      },
+      {
+        "name": "Quinta de Tilcoco",
+        "places": [
+          "Guacarhue",
+          "La Viña",
+          "Quinta de Tilcoco"
+        ]
+      },
+      {
+        "name": "Rancagua",
+        "places": [
+          "La Gonzalina",
+          "Punta de Cortés",
+          "Rancagua",
+          "San Ramón-Flor del Valle",
+          "Santa Lucía",
+          "Villa San Ramón Dos"
+        ]
+      },
+      {
+        "name": "Rengo",
+        "places": [
+          "Cerrillos",
+          "Chanqueahue",
+          "El Retiro",
+          "Esmeralda",
+          "La Chimba",
+          "Lo Cartagena",
+          "Los Choapinos",
+          "Los Gomeros",
+          "Naranjo Agrio",
+          "Patria Joven",
+          "Popeta",
+          "Pueblo Hundido",
+          "Rengo",
+          "Rosario"
+        ]
+      },
+      {
+        "name": "Requínoa",
+        "places": [
+          "El Abra",
+          "El Vaticano",
+          "Las Mercedes",
+          "Los Castaños",
+          "Los Lirios",
+          "Pimpinela",
+          "Requínoa",
+          "San José",
+          "Santa Amalia",
+          "Totihue Oriente",
+          "Villa María"
+        ]
+      },
+      {
+        "name": "San Fernando",
+        "places": [
+          "Agua Buena",
+          "Angostura",
+          "Las Rosas de Antivero",
+          "Puente Negro",
+          "Quilapán - Polonia",
+          "Roma de San José de Los Lingues",
+          "San Fernando",
+          "San José de Los Lingues",
+          "Talcarehue"
+        ]
+      },
+      {
+        "name": "San Vicente",
+        "places": [
+          "Bellavista",
+          "Calle Mena",
+          "Callejones",
+          "El Manzano",
+          "El Niche Abajo",
+          "El Tambo",
+          "La Orilla de Pencahue",
+          "Pencahue Abajo",
+          "Rastrojos",
+          "Requegua",
+          "Rinconada",
+          "San Vicente de Tagua Tagua",
+          "Santa Inés",
+          "Toquigua",
+          "Tunca Abajo",
+          "Tunca Arriba",
+          "Tunca El Cristo",
+          "Villa El Esfuerzo"
+        ]
+      },
+      {
+        "name": "Santa Cruz",
+        "places": [
+          "Asentamiento Yáquil",
+          "Camino A Cunaco",
+          "Camino Al Guindo",
+          "Chomedahue",
+          "El Boldal",
+          "El Tambo",
+          "Isla de yáquil-La Villa",
+          "Isla del Guindo",
+          "La Finca",
+          "La Mina",
+          "La Patagua",
+          "Los Boldos",
+          "Millahue",
+          "Quinahue",
+          "San José de Apalta",
+          "Santa Cruz",
+          "Villa El Cóndor"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Maule",
+    "communes": [
+      {
+        "name": "Cauquenes",
+        "places": [
+          "Barrio Estación",
+          "Cauquenes",
+          "Población Fernández",
+          "Quella",
+          "Santa Sofía",
+          "Sauzal"
+        ]
+      },
+      {
+        "name": "Chanco",
+        "places": [
+          "Chanco",
+          "La Vega",
+          "Pahuil"
+        ]
+      },
+      {
+        "name": "Colbún",
+        "places": [
+          "Colbún",
+          "Maule Sur",
+          "Panimávida",
+          "Panimávida Norte",
+          "Panimávida Poniente",
+          "Paso Rari",
+          "Quinamávida",
+          "San Nicolás",
+          "San Sebastián"
+        ]
+      },
+      {
+        "name": "Constitución",
+        "places": [
+          "Constitución",
+          "Junquillar",
+          "Los Pellines",
+          "Puertas Verdes",
+          "Putú",
+          "San Ramón",
+          "Santa Olga"
+        ]
+      },
+      {
+        "name": "Curepto",
+        "places": [
+          "Curepto",
+          "Gualleco",
+          "Huaquén"
+        ]
+      },
+      {
+        "name": "Curicó",
+        "places": [
+          "Curicó",
+          "El Maitén",
+          "La Palmera",
+          "Los Castaños",
+          "Los Cristales - El Prado",
+          "Los Niches",
+          "San Alberto",
+          "Santa Filomena",
+          "Sarmiento",
+          "Tutuquén Bajo",
+          "Villa Cordillera",
+          "Villa Los Niches",
+          "Villa San Martín",
+          "Vista Hermosa"
+        ]
+      },
+      {
+        "name": "Empedrado",
+        "places": [
+          "Empedrado"
+        ]
+      },
+      {
+        "name": "Hualañé",
+        "places": [
+          "Hualañé",
+          "La Huerta"
+        ]
+      },
+      {
+        "name": "Licantén",
+        "places": [
+          "Duao",
+          "Iloca",
+          "Licantén"
+        ]
+      },
+      {
+        "name": "Linares",
+        "places": [
+          "Camino Las Vegas",
+          "Las Obras",
+          "Linares",
+          "Palmilla",
+          "San Antonio",
+          "San Víctor Álamos",
+          "Tres Esquinas - Los Pinos",
+          "Vara Gruesa",
+          "Vega Ancoa"
+        ]
+      },
+      {
+        "name": "Longaví",
+        "places": [
+          "La Conquista",
+          "La Quinta Norte",
+          "Longaví",
+          "Los Cristales",
+          "Miraflores",
+          "Paine"
+        ]
+      },
+      {
+        "name": "Maule",
+        "places": [
+          "Callejones",
+          "Camino A Querquel",
+          "Chacarillas",
+          "Culenar",
+          "Los Nogales de Colín",
+          "Maule",
+          "Pedro Nolasco",
+          "Pueblecillo",
+          "Villa El Esfuerzo"
+        ]
+      },
+      {
+        "name": "Molina",
+        "places": [
+          "Bajo Los Romeros",
+          "Buena Unión",
+          "Casablanca",
+          "Itahue Uno",
+          "Lontué",
+          "Molina",
+          "Pichingal",
+          "San Jorge de Romeral",
+          "Tres Esquinas"
+        ]
+      },
+      {
+        "name": "Parral",
+        "places": [
+          "Camelia-Vista Hermosa",
+          "Los Carros",
+          "Parral",
+          "Termas de Catillo"
+        ]
+      },
+      {
+        "name": "Pelarco",
+        "places": [
+          "Pelarco",
+          "Santa Rita"
+        ]
+      },
+      {
+        "name": "Pelluhue",
+        "places": [
+          "Chovellén",
+          "Curanipe",
+          "Pelluhue"
+        ]
+      },
+      {
+        "name": "Pencahue",
+        "places": [
+          "Corinto",
+          "Lo Figueroa Sur",
+          "Pencahue"
+        ]
+      },
+      {
+        "name": "Rauco",
+        "places": [
+          "El Llano",
+          "Quicharco",
+          "Rauco"
+        ]
+      },
+      {
+        "name": "Retiro",
+        "places": [
+          "Camelia-Vista Hermosa",
+          "Copihue",
+          "Quillaimo",
+          "Retiro",
+          "Santa Isabel"
+        ]
+      },
+      {
+        "name": "Romeral",
+        "places": [
+          "Curicó",
+          "Guaico Dos",
+          "Guaico Tres",
+          "Guaico Uno-Los Francos",
+          "Romeral"
+        ]
+      },
+      {
+        "name": "Río Claro",
+        "places": [
+          "Camarico",
+          "Cumpeo",
+          "El Bolsico",
+          "El Umbral",
+          "La Vega",
+          "Las Mercedes",
+          "Los Montes",
+          "Porvenir",
+          "San Gerardo",
+          "Santa Rosa",
+          "Villa San Antonio"
+        ]
+      },
+      {
+        "name": "Sagrada Familia",
+        "places": [
+          "Corral de Piedra",
+          "Huaquén",
+          "La Campana-Las delicias",
+          "La Cruz",
+          "La Isla - Santa Rosa",
+          "Lo Valdivia",
+          "Sagrada Familia",
+          "Sanatorio",
+          "Santa Ana",
+          "Santa Carmen",
+          "Santa María",
+          "Villa Prat"
+        ]
+      },
+      {
+        "name": "San Clemente",
+        "places": [
+          "Aurora - Flor del Llano",
+          "Buenos Aires",
+          "Corralones",
+          "El Colorado",
+          "El Olivar",
+          "Mariposas",
+          "Queri",
+          "San Clemente",
+          "San Diego Norte",
+          "San Diego Sur"
+        ]
+      },
+      {
+        "name": "San Javier",
+        "places": [
+          "Alquihue",
+          "Alto del Río",
+          "Bobadilla",
+          "La Ilusión",
+          "Luis Cruz Martínez",
+          "Melozal",
+          "Orilla de Maule",
+          "Puente Pando",
+          "San Javier",
+          "San Manuel",
+          "Vaquería"
+        ]
+      },
+      {
+        "name": "San Rafael",
+        "places": [
+          "Alto Pangue",
+          "San Rafael"
+        ]
+      },
+      {
+        "name": "Talca",
+        "places": [
+          "El Oriente",
+          "El Porvenir",
+          "Huilquilemu",
+          "Panguilemo",
+          "Talca",
+          "Villa Illinois"
+        ]
+      },
+      {
+        "name": "Teno",
+        "places": [
+          "Comalle",
+          "El Cisne",
+          "El Quelmén",
+          "Hacienda Teno",
+          "La Laguna",
+          "Las Liras",
+          "San León",
+          "San Sebastián",
+          "Santa Rebeca",
+          "Santa Susana",
+          "Teno",
+          "Ventana del Bajo",
+          "Villa El Sauce",
+          "Viluco"
+        ]
+      },
+      {
+        "name": "Vichuquén",
+        "places": [
+          "Lago Vichuquén",
+          "Llico",
+          "Vichuquén"
+        ]
+      },
+      {
+        "name": "Villa Alegre",
+        "places": [
+          "Esperanza",
+          "Estación Villa Alegre",
+          "Lagunillas",
+          "Loma de Las Tortillas",
+          "Peñuelas",
+          "Putagán",
+          "San Manuel",
+          "Villa Alegre"
+        ]
+      },
+      {
+        "name": "Yerbas Buenas",
+        "places": [
+          "Abránquil",
+          "Cinco Caminos",
+          "El Esfuerzo",
+          "Esperanza",
+          "Las Acacias",
+          "Maitencillo Adentro",
+          "Maitencillo Afuera-Semillero",
+          "Peñuelas",
+          "Santa Ana de Queri",
+          "Santa Elena",
+          "Yerbas Buenas"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Biobío",
+    "communes": [
+      {
+        "name": "Alto Biobío",
+        "places": [
+          "Ralco"
+        ]
+      },
+      {
+        "name": "Antuco",
+        "places": [
+          "Antuco"
+        ]
+      },
+      {
+        "name": "Arauco",
+        "places": [
+          "Arauco",
+          "Carampangue",
+          "Conumo",
+          "Laraquete",
+          "Llico",
+          "Pichilo",
+          "Punta Lavapié",
+          "Ramadillas",
+          "Tubul"
+        ]
+      },
+      {
+        "name": "Cabrero",
+        "places": [
+          "Cabrero",
+          "Charrúa",
+          "Chillancito",
+          "Monte Águila"
+        ]
+      },
+      {
+        "name": "Cañete",
+        "places": [
+          "Cayucupil",
+          "Cañete",
+          "Huillinco"
+        ]
+      },
+      {
+        "name": "Chiguayante",
+        "places": [
+          "Chiguayante"
+        ]
+      },
+      {
+        "name": "Concepción",
+        "places": [
+          "Chaimávida Soto",
+          "Concepción",
+          "El Pino",
+          "Juan Riquelme",
+          "Lomas de Andalién",
+          "San Jorge"
+        ]
+      },
+      {
+        "name": "Contulmo",
+        "places": [
+          "Calebu",
+          "Contulmo",
+          "Villa Rivas"
+        ]
+      },
+      {
+        "name": "Coronel",
+        "places": [
+          "Coronel",
+          "Puerto Norte",
+          "Puerto Sur"
+        ]
+      },
+      {
+        "name": "Curanilahue",
+        "places": [
+          "Curanilahue",
+          "San José de Colico"
+        ]
+      },
+      {
+        "name": "Florida",
+        "places": [
+          "Copiulemu",
+          "Florida",
+          "Tapihue"
+        ]
+      },
+      {
+        "name": "Hualpén",
+        "places": [
+          "Caleta Lenga",
+          "Hualpén"
+        ]
+      },
+      {
+        "name": "Hualqui",
+        "places": [
+          "Hualqui",
+          "Periquillo",
+          "Quilacoya",
+          "Talcamávida",
+          "Unihue"
+        ]
+      },
+      {
+        "name": "Laja",
+        "places": [
+          "La Laja",
+          "Santa Elena",
+          "Villa Laja"
+        ]
+      },
+      {
+        "name": "Lebu",
+        "places": [
+          "Lebu",
+          "Pehuén",
+          "Santa Rosa"
+        ]
+      },
+      {
+        "name": "Los Álamos",
+        "places": [
+          "Antiguala",
+          "Cerro Alto",
+          "Los Álamos",
+          "Villa Los Ríos"
+        ]
+      },
+      {
+        "name": "Los Ángeles",
+        "places": [
+          "Chacayal",
+          "El Manzano",
+          "El Peral",
+          "Las Delicias",
+          "Los Tilos",
+          "Los Ángeles",
+          "Millantú",
+          "Rarinco Central",
+          "San Carlos de Purén",
+          "Santa Fé",
+          "Tolpán",
+          "Villa Duqueco",
+          "Villa Génesis",
+          "Villa San Francisco",
+          "Virquenco"
+        ]
+      },
+      {
+        "name": "Lota",
+        "places": [
+          "Lota"
+        ]
+      },
+      {
+        "name": "Mulchén",
+        "places": [
+          "Mirador de Loma Verde",
+          "Mulchén"
+        ]
+      },
+      {
+        "name": "Nacimiento",
+        "places": [
+          "Nacimiento"
+        ]
+      },
+      {
+        "name": "Negrete",
+        "places": [
+          "Coihue",
+          "Luis Salamanca",
+          "Negrete"
+        ]
+      },
+      {
+        "name": "Penco",
+        "places": [
+          "Penco"
+        ]
+      },
+      {
+        "name": "Quilaco",
+        "places": [
+          "Quilaco"
+        ]
+      },
+      {
+        "name": "Quilleco",
+        "places": [
+          "Las Canteras",
+          "Quilleco",
+          "San Lorencito",
+          "Villa Las Flores",
+          "Villa Mercedes"
+        ]
+      },
+      {
+        "name": "San Pedro de La Paz",
+        "places": [
+          "San Pedro de La Paz"
+        ]
+      },
+      {
+        "name": "San Rosendo",
+        "places": [
+          "San Rosendo"
+        ]
+      },
+      {
+        "name": "Santa Bárbara",
+        "places": [
+          "Santa Bárbara"
+        ]
+      },
+      {
+        "name": "Santa Juana",
+        "places": [
+          "Santa Juana"
+        ]
+      },
+      {
+        "name": "Talcahuano",
+        "places": [
+          "Caleta Tumbes",
+          "Talcahuano"
+        ]
+      },
+      {
+        "name": "Tirúa",
+        "places": [
+          "Quidico",
+          "Tirúa"
+        ]
+      },
+      {
+        "name": "Tomé",
+        "places": [
+          "Altos de Punta de Parra",
+          "Dichato",
+          "Los Morros",
+          "Menque",
+          "Punta de Parra",
+          "Rafael",
+          "Tomé"
+        ]
+      },
+      {
+        "name": "Tucapel",
+        "places": [
+          "Huépil",
+          "Polcura",
+          "Trupán",
+          "Tucapel"
+        ]
+      },
+      {
+        "name": "Yumbel",
+        "places": [
+          "Estación Yumbel",
+          "La Aguada",
+          "Río Claro",
+          "Yumbel"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "La Araucanía",
+    "communes": [
+      {
+        "name": "Angol",
+        "places": [
+          "Angol"
+        ]
+      },
+      {
+        "name": "Carahue",
+        "places": [
+          "Carahue",
+          "Nehuentúe",
+          "Trovolhue"
+        ]
+      },
+      {
+        "name": "Cholchol",
+        "places": [
+          "Cholchol",
+          "Villa El Estero"
+        ]
+      },
+      {
+        "name": "Collipulli",
+        "places": [
+          "Collipulli",
+          "Mininco"
+        ]
+      },
+      {
+        "name": "Cunco",
+        "places": [
+          "Choroico",
+          "Cunco",
+          "Las Hortensias",
+          "Los Laureles"
+        ]
+      },
+      {
+        "name": "Curacautín",
+        "places": [
+          "Curacautín",
+          "Malalcahuello"
+        ]
+      },
+      {
+        "name": "Curarrehue",
+        "places": [
+          "Catripulli",
+          "Curarrehue"
+        ]
+      },
+      {
+        "name": "Ercilla",
+        "places": [
+          "Ercilla",
+          "Pailahueque",
+          "Pidima"
+        ]
+      },
+      {
+        "name": "Freire",
+        "places": [
+          "Freire",
+          "Nuevo Amanecer",
+          "Población Humberto Toro",
+          "Quepe",
+          "Radal"
+        ]
+      },
+      {
+        "name": "Galvarino",
+        "places": [
+          "Galvarino"
+        ]
+      },
+      {
+        "name": "Gorbea",
+        "places": [
+          "Gorbea",
+          "Lastarria",
+          "Quitratué"
+        ]
+      },
+      {
+        "name": "Lautaro",
+        "places": [
+          "Lautaro",
+          "Pillanlelbún"
+        ]
+      },
+      {
+        "name": "Loncoche",
+        "places": [
+          "Huiscapi",
+          "La Paz",
+          "Loncoche"
+        ]
+      },
+      {
+        "name": "Lonquimay",
+        "places": [
+          "Lonquimay"
+        ]
+      },
+      {
+        "name": "Los Sauces",
+        "places": [
+          "Los Sauces"
+        ]
+      },
+      {
+        "name": "Lumaco",
+        "places": [
+          "Capitán Pastene",
+          "Lumaco"
+        ]
+      },
+      {
+        "name": "Melipeuco",
+        "places": [
+          "Melipeuco"
+        ]
+      },
+      {
+        "name": "Nueva Imperial",
+        "places": [
+          "Nueva Imperial",
+          "Villa Almagro"
+        ]
+      },
+      {
+        "name": "Padre Las Casas",
+        "places": [
+          "Padre Las Casas",
+          "San Ramón"
+        ]
+      },
+      {
+        "name": "Perquenco",
+        "places": [
+          "Perquenco"
+        ]
+      },
+      {
+        "name": "Pitrufquén",
+        "places": [
+          "Pitrufquén"
+        ]
+      },
+      {
+        "name": "Pucón",
+        "places": [
+          "Caburgua",
+          "El Claro",
+          "Pucón"
+        ]
+      },
+      {
+        "name": "Purén",
+        "places": [
+          "Caupolicán",
+          "Purén"
+        ]
+      },
+      {
+        "name": "Renaico",
+        "places": [
+          "Renaico",
+          "Tijeral"
+        ]
+      },
+      {
+        "name": "Saavedra",
+        "places": [
+          "Puerto Domínguez",
+          "Puerto Saavedra"
+        ]
+      },
+      {
+        "name": "Temuco",
+        "places": [
+          "Labranza",
+          "Los Fundadores",
+          "Portal San Francisco",
+          "Temuco",
+          "Villa Ayelen",
+          "Villa Carmen de Las Rosas",
+          "Villa Los Labradores",
+          "Villa Los Robles"
+        ]
+      },
+      {
+        "name": "Teodoro Schmidt",
+        "places": [
+          "Barros Arana",
+          "El Resplandor",
+          "Hualpín",
+          "Teodoro Schmidt"
+        ]
+      },
+      {
+        "name": "Toltén",
+        "places": [
+          "Nueva Toltén",
+          "Portal de Queule",
+          "Queule",
+          "Villa Los Boldos"
+        ]
+      },
+      {
+        "name": "Traiguén",
+        "places": [
+          "Traiguén"
+        ]
+      },
+      {
+        "name": "Victoria",
+        "places": [
+          "Púa",
+          "Quino",
+          "Selva Oscura",
+          "Victoria"
+        ]
+      },
+      {
+        "name": "Vilcún",
+        "places": [
+          "Cajón",
+          "Cherquenco",
+          "General López",
+          "San Lorenzo",
+          "San Patricio",
+          "Vilcún"
+        ]
+      },
+      {
+        "name": "Villarrica",
+        "places": [
+          "Licán Ray",
+          "Llau Llau",
+          "Villarrica",
+          "Voipir",
+          "Ñancul"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Los Lagos",
+    "communes": [
+      {
+        "name": "Ancud",
+        "places": [
+          "Ancud",
+          "Chacao"
+        ]
+      },
+      {
+        "name": "Calbuco",
+        "places": [
+          "Calbuco",
+          "Pargua"
+        ]
+      },
+      {
+        "name": "Castro",
+        "places": [
+          "Castro",
+          "Coihuinco",
+          "La Chacra",
+          "Llau Llao",
+          "Los Aromos",
+          "Pid Pid"
+        ]
+      },
+      {
+        "name": "Chaitén",
+        "places": [
+          "Chaitén"
+        ]
+      },
+      {
+        "name": "Chonchi",
+        "places": [
+          "Chonchi",
+          "Huillinco"
+        ]
+      },
+      {
+        "name": "Cochamó",
+        "places": [
+          "Cochamó"
+        ]
+      },
+      {
+        "name": "Curaco de Vélez",
+        "places": [
+          "Curaco de Vélez"
+        ]
+      },
+      {
+        "name": "Dalcahue",
+        "places": [
+          "Dalcahue",
+          "Dalcahue Norte"
+        ]
+      },
+      {
+        "name": "Fresia",
+        "places": [
+          "Fresia",
+          "Tegualda"
+        ]
+      },
+      {
+        "name": "Frutillar",
+        "places": [
+          "Casma",
+          "Frutillar"
+        ]
+      },
+      {
+        "name": "Futaleufú",
+        "places": [
+          "Futaleufú"
+        ]
+      },
+      {
+        "name": "Hualaihué",
+        "places": [
+          "Contao",
+          "Río Negro"
+        ]
+      },
+      {
+        "name": "Llanquihue",
+        "places": [
+          "Llanquihue",
+          "Los Pellines"
+        ]
+      },
+      {
+        "name": "Los Muermos",
+        "places": [
+          "Cañitas",
+          "Los Muermos"
+        ]
+      },
+      {
+        "name": "Maullín",
+        "places": [
+          "Carelmapu",
+          "La Pasada - Lepihue",
+          "Maullín",
+          "Quenuir"
+        ]
+      },
+      {
+        "name": "Osorno",
+        "places": [
+          "Cancura",
+          "Osorno"
+        ]
+      },
+      {
+        "name": "Palena",
+        "places": [
+          "Palena"
+        ]
+      },
+      {
+        "name": "Puerto Montt",
+        "places": [
+          "Alerce",
+          "Chinchín Grande",
+          "Coihuín",
+          "Colonia Alerce",
+          "Costa Chinquio",
+          "El Tepual",
+          "La Lagunita",
+          "La Vara - Senda Sur",
+          "Lagunitas Sur",
+          "Llanos de Tenglo",
+          "Los Pinos",
+          "Pelluco",
+          "Portal del Sur",
+          "Puerto Montt",
+          "Puntilla Tenglo",
+          "San Antonio"
+        ]
+      },
+      {
+        "name": "Puerto Octay",
+        "places": [
+          "Las Cascadas",
+          "Puerto Octay",
+          "Puerto Octay Alto"
+        ]
+      },
+      {
+        "name": "Puerto Varas",
+        "places": [
+          "Mirador de Puerto Varas",
+          "Nueva Braunau",
+          "Puerto Varas"
+        ]
+      },
+      {
+        "name": "Puqueldón",
+        "places": [
+          "Puqueldón"
+        ]
+      },
+      {
+        "name": "Purranque",
+        "places": [
+          "Corte Alto",
+          "Purranque"
+        ]
+      },
+      {
+        "name": "Puyehue",
+        "places": [
+          "Entre Lagos",
+          "Pilmaiquén"
+        ]
+      },
+      {
+        "name": "Queilén",
+        "places": [
+          "Queilén"
+        ]
+      },
+      {
+        "name": "Quellón",
+        "places": [
+          "Auchac",
+          "Curanue",
+          "Quellón"
+        ]
+      },
+      {
+        "name": "Quemchi",
+        "places": [
+          "Quemchi"
+        ]
+      },
+      {
+        "name": "Quinchao",
+        "places": [
+          "Achao"
+        ]
+      },
+      {
+        "name": "Río Negro",
+        "places": [
+          "Riachuelo",
+          "Río Negro"
+        ]
+      },
+      {
+        "name": "San Juan de La Costa",
+        "places": [
+          "Bahía Mansa",
+          "Puaucho"
+        ]
+      },
+      {
+        "name": "San Pablo",
+        "places": [
+          "San Pablo"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Aysén del General Carlos Ibáñez del Campo",
+    "communes": [
+      {
+        "name": "Aysén",
+        "places": [
+          "Puerto Aguirre",
+          "Puerto Aysén",
+          "Puerto Chacabuco",
+          "Villa Mañiguales"
+        ]
+      },
+      {
+        "name": "Chile Chico",
+        "places": [
+          "Chile Chico",
+          "Puerto Guadal"
+        ]
+      },
+      {
+        "name": "Cisnes",
+        "places": [
+          "La Junta",
+          "Puerto Cisnes",
+          "Puerto Puyuhuapi"
+        ]
+      },
+      {
+        "name": "Cochrane",
+        "places": [
+          "Cochrane"
+        ]
+      },
+      {
+        "name": "Coyhaique",
+        "places": [
+          "Balmaceda",
+          "Coyhaique",
+          "Valle Simpson"
+        ]
+      },
+      {
+        "name": "Guaitecas",
+        "places": [
+          "Melinka"
+        ]
+      },
+      {
+        "name": "Lago Verde",
+        "places": []
+      },
+      {
+        "name": "O'Higgins",
+        "places": [
+          "Villa O'Higgins"
+        ]
+      },
+      {
+        "name": "Río Ibáñez",
+        "places": [
+          "Puerto Ibáñez",
+          "Puerto Río Tranquilo",
+          "Villa Cerro Castillo"
+        ]
+      },
+      {
+        "name": "Tortel",
+        "places": [
+          "Caleta Tortel"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Magallanes y de La Antártica Chilena",
+    "communes": [
+      {
+        "name": "Antártica",
+        "places": []
+      },
+      {
+        "name": "Cabo de Hornos",
+        "places": [
+          "Puerto Williams"
+        ]
+      },
+      {
+        "name": "Laguna Blanca",
+        "places": []
+      },
+      {
+        "name": "Natales",
+        "places": [
+          "Puerto Natales"
+        ]
+      },
+      {
+        "name": "Porvenir",
+        "places": [
+          "Porvenir"
+        ]
+      },
+      {
+        "name": "Primavera",
+        "places": []
+      },
+      {
+        "name": "Punta Arenas",
+        "places": [
+          "Punta Arenas",
+          "René Schneider",
+          "Río Seco"
+        ]
+      },
+      {
+        "name": "Río Verde",
+        "places": []
+      },
+      {
+        "name": "San Gregorio",
+        "places": []
+      },
+      {
+        "name": "Timaukel",
+        "places": []
+      },
+      {
+        "name": "Torres del Paine",
+        "places": []
+      }
+    ]
+  },
+  {
+    "name": "Metropolitana de Santiago",
+    "communes": [
+      {
+        "name": "Alhué",
+        "places": [
+          "Hacienda Alhué",
+          "Ignacio Carrera Pinto",
+          "Villa Alhué"
+        ]
+      },
+      {
+        "name": "Buin",
+        "places": [
+          "Alto Jahuel",
+          "Buin",
+          "Cerrillos",
+          "El Parrón",
+          "El Recurso",
+          "El Rulo",
+          "Los Areneros",
+          "Santa Filomena",
+          "Valdivia de Paine",
+          "Viluco"
+        ]
+      },
+      {
+        "name": "Calera de Tango",
+        "places": [
+          "Bajos de San Agustín",
+          "El Roto Chileno",
+          "La Primavera",
+          "Los Tilos",
+          "Palermo",
+          "San Ignacio",
+          "Villa Jesús",
+          "Villorrio Valle de Tango"
+        ]
+      },
+      {
+        "name": "Cerrillos",
+        "places": [
+          "Cerrillos"
+        ]
+      },
+      {
+        "name": "Cerro Navia",
+        "places": [
+          "Cerro Navia"
+        ]
+      },
+      {
+        "name": "Colina",
+        "places": [
+          "Aldea Los Ingleses",
+          "Carretera San Martín",
+          "Chacabuco",
+          "Chamisero",
+          "Chicureo",
+          "Colina",
+          "El Colorado",
+          "Las Canteras",
+          "Lo Arcaya - Casas Viejas",
+          "Quilapilún",
+          "San José",
+          "Santa Elena",
+          "Santa Marta de Liray"
+        ]
+      },
+      {
+        "name": "Conchalí",
+        "places": [
+          "Conchalí"
+        ]
+      },
+      {
+        "name": "Curacaví",
+        "places": [
+          "Camino San Pastor",
+          "Cerrillos",
+          "Curacaví",
+          "Lo Alvarado",
+          "Miraflores",
+          "Patagüilla",
+          "Patagüilla El Bosque"
+        ]
+      },
+      {
+        "name": "El Bosque",
+        "places": [
+          "El Bosque"
+        ]
+      },
+      {
+        "name": "El Monte",
+        "places": [
+          "Chiñihue El Cristo",
+          "Chiñihue Los Quilos",
+          "El Monte",
+          "Nazario Araos"
+        ]
+      },
+      {
+        "name": "Estación Central",
+        "places": [
+          "Estación Central"
+        ]
+      },
+      {
+        "name": "Huechuraba",
+        "places": [
+          "Huechuraba"
+        ]
+      },
+      {
+        "name": "Independencia",
+        "places": [
+          "Independencia"
+        ]
+      },
+      {
+        "name": "Isla de Maipo",
+        "places": [
+          "Isla de Maipo",
+          "Isla de Maipo Sur",
+          "La Islita",
+          "Las Mercedes",
+          "Lonquén",
+          "Puntilla de Lonquén",
+          "San Antonio de Naltagua",
+          "San Vicente de Naltagua"
+        ]
+      },
+      {
+        "name": "La Cisterna",
+        "places": [
+          "La Cisterna"
+        ]
+      },
+      {
+        "name": "La Florida",
+        "places": [
+          "La Florida"
+        ]
+      },
+      {
+        "name": "La Granja",
+        "places": [
+          "La Granja"
+        ]
+      },
+      {
+        "name": "La Pintana",
+        "places": [
+          "La Pintana"
+        ]
+      },
+      {
+        "name": "La Reina",
+        "places": [
+          "La Reina"
+        ]
+      },
+      {
+        "name": "Lampa",
+        "places": [
+          "Batuco",
+          "Chicauma - Valle Grande",
+          "El Crucero",
+          "El Lucero",
+          "El Lucero Norte",
+          "Esfuerzo Campesino",
+          "Estación Colina",
+          "La Vilina",
+          "Lampa",
+          "Lo Castro",
+          "Lo Vargas",
+          "Los Espinos",
+          "Sol de Septiembre"
+        ]
+      },
+      {
+        "name": "Las Condes",
+        "places": [
+          "Las Condes"
+        ]
+      },
+      {
+        "name": "Lo Barnechea",
+        "places": [
+          "Lo Barnechea"
+        ]
+      },
+      {
+        "name": "Lo Espejo",
+        "places": [
+          "Lo Espejo"
+        ]
+      },
+      {
+        "name": "Lo Prado",
+        "places": [
+          "Lo Prado"
+        ]
+      },
+      {
+        "name": "Macul",
+        "places": [
+          "Macul"
+        ]
+      },
+      {
+        "name": "Maipú",
+        "places": [
+          "El Maitén",
+          "Joaquín Olivares",
+          "Maipú",
+          "Pueblito La Farfana"
+        ]
+      },
+      {
+        "name": "María Pinto",
+        "places": [
+          "Chorombo Bajo",
+          "Ibacache Alto - Chorombo",
+          "Las Mercedes",
+          "Los Rulos",
+          "Malalhue",
+          "María Pinto",
+          "San Enrique",
+          "Santa Emilia",
+          "Villa Santa Luisa"
+        ]
+      },
+      {
+        "name": "Melipilla",
+        "places": [
+          "Bollenar",
+          "Carmen Bajo",
+          "Chocalán",
+          "Cholqui",
+          "Codigua",
+          "Colonias de Puangue",
+          "El Pimiento",
+          "Esmeralda",
+          "Huechún Bajo",
+          "La Viluma",
+          "Melipilla",
+          "Pabellón",
+          "Pomaire",
+          "San José",
+          "San Ramón",
+          "Santa Rosa",
+          "Santa Teresa",
+          "Santa Victoria"
+        ]
+      },
+      {
+        "name": "Padre Hurtado",
+        "places": [
+          "El Curato Oriente",
+          "Padre Hurtado",
+          "Santa Lucía",
+          "Santa Mónica"
+        ]
+      },
+      {
+        "name": "Paine",
+        "places": [
+          "Aparición Oriente",
+          "Chada",
+          "Colonia Kennedy",
+          "El Escorial",
+          "El Tránsito",
+          "Hospital",
+          "Huelquén",
+          "Huiticalán",
+          "Paine",
+          "Pintué - La Guachera",
+          "Rangue",
+          "Santa Marta",
+          "Veinticuatro de Abril",
+          "Águila Sur"
+        ]
+      },
+      {
+        "name": "Pedro Aguirre Cerda",
+        "places": [
+          "Pedro Aguirre Cerda"
+        ]
+      },
+      {
+        "name": "Peñaflor",
+        "places": [
+          "Peñaflor"
+        ]
+      },
+      {
+        "name": "Peñalolén",
+        "places": [
+          "Peñalolén"
+        ]
+      },
+      {
+        "name": "Pirque",
+        "places": [
+          "El Principal",
+          "Lo Arcaya",
+          "Los Silos",
+          "Patricio Gana Lyon",
+          "Pirque",
+          "San Vicente",
+          "Villorio El Llano",
+          "Villorio San José Obrero"
+        ]
+      },
+      {
+        "name": "Providencia",
+        "places": [
+          "Providencia"
+        ]
+      },
+      {
+        "name": "Pudahuel",
+        "places": [
+          "Ciudad de Los Valles",
+          "El Noviciado",
+          "Lo Aguirre",
+          "Noviciado Alto - El Cambucho",
+          "Peralito - Campo Alegre",
+          "Praderas de Lo Aguirre",
+          "Pudahuel",
+          "Villa Campo Alegre"
+        ]
+      },
+      {
+        "name": "Puente Alto",
+        "places": [
+          "Puente Alto"
+        ]
+      },
+      {
+        "name": "Quilicura",
+        "places": [
+          "Quilicura"
+        ]
+      },
+      {
+        "name": "Quinta Normal",
+        "places": [
+          "Quinta Normal"
+        ]
+      },
+      {
+        "name": "Recoleta",
+        "places": [
+          "Recoleta"
+        ]
+      },
+      {
+        "name": "Renca",
+        "places": [
+          "Renca"
+        ]
+      },
+      {
+        "name": "San Bernardo",
+        "places": [
+          "La Vara",
+          "Lo Herrera",
+          "San Bernardo"
+        ]
+      },
+      {
+        "name": "San Joaquín",
+        "places": [
+          "San Joaquín"
+        ]
+      },
+      {
+        "name": "San José de Maipo",
+        "places": [
+          "La Obra - Las Vertientes",
+          "San Alfonso",
+          "San Gabriel",
+          "San José de Maipo"
+        ]
+      },
+      {
+        "name": "San Miguel",
+        "places": [
+          "San Miguel"
+        ]
+      },
+      {
+        "name": "San Pedro",
+        "places": [
+          "El Prado",
+          "San Pedro"
+        ]
+      },
+      {
+        "name": "San Ramón",
+        "places": [
+          "San Ramón"
+        ]
+      },
+      {
+        "name": "Santiago",
+        "places": [
+          "Santiago"
+        ]
+      },
+      {
+        "name": "Talagante",
+        "places": [
+          "El Carmen",
+          "El Roto Chileno",
+          "Lonquén",
+          "Talagante"
+        ]
+      },
+      {
+        "name": "Tiltil",
+        "places": [
+          "Alto El Manzano",
+          "Estación Polpaico",
+          "Huertos Familiares",
+          "Montenegro",
+          "Plazuela de Polpaico",
+          "Rungue",
+          "Santa Matilde",
+          "Tiltil"
+        ]
+      },
+      {
+        "name": "Vitacura",
+        "places": [
+          "Vitacura"
+        ]
+      },
+      {
+        "name": "Ñuñoa",
+        "places": [
+          "Ñuñoa"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Los Ríos",
+    "communes": [
+      {
+        "name": "Corral",
+        "places": [
+          "Corral",
+          "La Aguada"
+        ]
+      },
+      {
+        "name": "Futrono",
+        "places": [
+          "Futrono",
+          "Llifén",
+          "Nontuela"
+        ]
+      },
+      {
+        "name": "La Unión",
+        "places": [
+          "La Unión"
+        ]
+      },
+      {
+        "name": "Lago Ranco",
+        "places": [
+          "Ignao",
+          "Lago Ranco"
+        ]
+      },
+      {
+        "name": "Lanco",
+        "places": [
+          "Lanco",
+          "Malalhue"
+        ]
+      },
+      {
+        "name": "Los Lagos",
+        "places": [
+          "Antilhue",
+          "Folilco",
+          "Los Lagos"
+        ]
+      },
+      {
+        "name": "Mariquina",
+        "places": [
+          "Ciruelos",
+          "Estación Mariquina",
+          "Mehuín",
+          "Misisipí",
+          "Pelchuquín",
+          "San José de La Mariquina"
+        ]
+      },
+      {
+        "name": "Máfil",
+        "places": [
+          "Máfil"
+        ]
+      },
+      {
+        "name": "Paillaco",
+        "places": [
+          "Paillaco",
+          "Pichirropulli",
+          "Reumén"
+        ]
+      },
+      {
+        "name": "Panguipulli",
+        "places": [
+          "Choshuenco",
+          "Coñaripe",
+          "Huellahue",
+          "Liquiñe",
+          "Melefquén",
+          "Neltume",
+          "Panguipulli",
+          "Puerto Fuy"
+        ]
+      },
+      {
+        "name": "Río Bueno",
+        "places": [
+          "Crucero",
+          "Río Bueno"
+        ]
+      },
+      {
+        "name": "Valdivia",
+        "places": [
+          "El Arenal",
+          "El Rodeo",
+          "Los Molinos",
+          "Mirador del Calle Calle",
+          "Niebla",
+          "Pino Huacho",
+          "Valdivia"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Arica y Parinacota",
+    "communes": [
+      {
+        "name": "Arica",
+        "places": [
+          "Acha",
+          "Arica",
+          "Quebrada del Diablo",
+          "San Miguel",
+          "Valle Hermoso",
+          "Villa Frontera",
+          "Villa Primavera"
+        ]
+      },
+      {
+        "name": "Camarones",
+        "places": []
+      },
+      {
+        "name": "General Lagos",
+        "places": []
+      },
+      {
+        "name": "Putre",
+        "places": [
+          "Putre"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ñuble",
+    "communes": [
+      {
+        "name": "Bulnes",
+        "places": [
+          "Bulnes",
+          "Santa Clara",
+          "Tres Esquinas"
+        ]
+      },
+      {
+        "name": "Chillán",
+        "places": [
+          "Capilla Cox",
+          "Chillán",
+          "El Emboque",
+          "Las Mariposas",
+          "Quinchamalí",
+          "Quinquegua",
+          "Reloca",
+          "Rinconada de Cato",
+          "Villa Doña Violeta y Don Ambrosio",
+          "Villa Los Huertos"
+        ]
+      },
+      {
+        "name": "Chillán Viejo",
+        "places": [
+          "Chillán Viejo",
+          "Quillay",
+          "Rucapequén"
+        ]
+      },
+      {
+        "name": "Cobquecura",
+        "places": [
+          "Buchupureo",
+          "Cobquecura"
+        ]
+      },
+      {
+        "name": "Coelemu",
+        "places": [
+          "Coelemu",
+          "Ranguelmo"
+        ]
+      },
+      {
+        "name": "Coihueco",
+        "places": [
+          "Bustamante",
+          "Coihueco",
+          "La Viñita",
+          "Minas del Prado",
+          "San Antonio de Cato",
+          "Talquipén",
+          "Villa El Manzano"
+        ]
+      },
+      {
+        "name": "El Carmen",
+        "places": [
+          "El Carmen"
+        ]
+      },
+      {
+        "name": "Ninhue",
+        "places": [
+          "Ninhue"
+        ]
+      },
+      {
+        "name": "Pemuco",
+        "places": [
+          "General Cruz",
+          "Pemuco",
+          "San Miguel de Diguillín"
+        ]
+      },
+      {
+        "name": "Pinto",
+        "places": [
+          "El Rosal",
+          "Las Vertientes",
+          "Patagual",
+          "Pinto",
+          "Recinto - Los Lleuques"
+        ]
+      },
+      {
+        "name": "Portezuelo",
+        "places": [
+          "Portezuelo"
+        ]
+      },
+      {
+        "name": "Quillón",
+        "places": [
+          "Quillón",
+          "Villa Las Mercedes"
+        ]
+      },
+      {
+        "name": "Quirihue",
+        "places": [
+          "Quirihue"
+        ]
+      },
+      {
+        "name": "Ránquil",
+        "places": [
+          "Nueva Aldea",
+          "San Ignacio de Palomares",
+          "Ñipas"
+        ]
+      },
+      {
+        "name": "San Carlos",
+        "places": [
+          "Cachapoal",
+          "El Torreón",
+          "Las Arboledas",
+          "Nueva Esperanza",
+          "Ribera de Ñuble",
+          "San Carlos",
+          "Villa Illinois"
+        ]
+      },
+      {
+        "name": "San Fabián",
+        "places": [
+          "San Fabián de Alico"
+        ]
+      },
+      {
+        "name": "San Ignacio",
+        "places": [
+          "Pueblo Seco",
+          "Quiriquina",
+          "San Ignacio",
+          "San Miguel"
+        ]
+      },
+      {
+        "name": "San Nicolás",
+        "places": [
+          "Dadinco",
+          "Lomas de Puyaral",
+          "Puente Ñuble",
+          "San Nicolás"
+        ]
+      },
+      {
+        "name": "Trehuaco",
+        "places": [
+          "Hernán Brañas",
+          "Trehuaco"
+        ]
+      },
+      {
+        "name": "Yungay",
+        "places": [
+          "Campanario",
+          "Yungay"
+        ]
+      },
+      {
+        "name": "Ñiquén",
+        "places": [
+          "San Gregorio"
+        ]
+      }
+    ]
+  }
+]

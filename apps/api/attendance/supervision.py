@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 from django.db import transaction
 from django.db.models import DateTimeField, F, Case, When, Value, CharField, Exists, OuterRef, Subquery, Q, Count
-from django.db.models.functions import Cast, Coalesce
+from django.db.models.functions import Cast, Coalesce, ExtractHour
 from django.db.models.fields.json import KeyTextTransform
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -32,6 +32,7 @@ class Filters(StrictInputMixin, serializers.Serializer):
     state = serializers.ChoiceField(choices=STATES, required=False)
     ordering = serializers.ChoiceField(choices=['last_name', '-last_name', 'job_title'], default='last_name')
     page = serializers.IntegerField(min_value=1, required=False)
+    dashboard = serializers.BooleanField(required=False, default=False)
 
 class ReviewInput(StrictInputMixin, serializers.Serializer):
     state = serializers.ChoiceField(choices=['PENDING', 'REVIEWING', 'RESOLVED'])
@@ -137,6 +138,22 @@ class RosterView(ManagerBase):
         page = self.paginate_queryset(rows)
         response = self.get_paginated_response(serialize_rows(self.business, page, now))
         response.data.update(summary=counts, indicators=indicators, generated_at=now, date=filters['date'], timezone=self.business.planning_timezone)
+        if filters['dashboard']:
+            local_zone = ZoneInfo(self.business.planning_timezone)
+            start = datetime.combine(filters['date'], time.min, tzinfo=local_zone)
+            end = datetime.combine(filters['date'] + timedelta(days=1), time.min, tzinfo=local_zone)
+            entries = AttendanceEvent.objects.filter(
+                business=self.business, event_type='CLOCK_IN', recorded_at__gte=start, recorded_at__lt=end,
+            ).annotate(hour=ExtractHour('recorded_at', tzinfo=local_zone)).values('hour').annotate(total=Count('pk'))
+            by_hour = {row['hour']: row['total'] for row in entries}
+            response.data['dashboard'] = {
+                'entries': [{'hour': hour, 'count': by_hour.get(hour, 0) + by_hour.get(hour + 1, 0)}
+                            for hour in range(0, 24, 2)],
+                'completed_shifts': AttendanceSession.objects.filter(
+                    business=self.business, state='FINISHED', shift__business=self.business,
+                    shift__status='SCHEDULED', shift__starts_at__lt=end, shift__ends_at__gt=start,
+                ).values('shift_id').distinct().count(),
+            }
         return response
 
 class PersonView(ManagerBase):
@@ -172,6 +189,9 @@ class ReviewView(ManagerBase):
 
 class ReportView(ManagerBase):
     def get(self, request, **kwargs):
+        if not kwargs.get('export', False):
+            from billing.access import require_feature
+            require_feature(self.business, 'reports')
         filters = self.filters()
         day = filters['date']
         if filters['period'] == 'weekly':

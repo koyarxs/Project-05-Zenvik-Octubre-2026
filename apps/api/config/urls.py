@@ -17,8 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
+from billing.views import CatalogView, FlowCallbackView
+from .health import live, ready
 
 urlpatterns = [
+    path('health/live/', live),
+    path('health/ready/', ready),
+    path('api/v1/billing/plans/', CatalogView.as_view()),
+    path('api/v1/billing/flow/callback/', FlowCallbackView.as_view()),
+    path('api/v1/businesses/<uuid:business_id>/billing/', include('billing.urls')),
     path('api/v1/auth/', include('accounts.urls')),
     path('api/v1/businesses/', include('businesses.urls')),
     path('api/v1/businesses/<uuid:business_id>/attendance/', include('attendance.urls')),

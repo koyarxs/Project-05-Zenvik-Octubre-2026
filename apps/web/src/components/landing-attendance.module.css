@@ -1,0 +1,14 @@
+.section { background: #fff; color: #10213b; border-top: 1px solid #fff0e5; overflow: hidden; }
+.inner { max-width: 1360px; margin: auto; padding: 70px 40px 45px; display: grid; grid-template-columns: .72fr 1.28fr; align-items: center; gap: 22px; }
+.copy { padding-bottom: 40px; }
+.label { margin: 0 0 25px; color: #b94a09; font-size: 12px; font-weight: 500; }
+.copy h2 { margin: 0; font-size: clamp(38px,4.15vw,61px); font-weight: 650; letter-spacing: -.055em; line-height: 1.07; }
+.copy h2 em { font-style: normal; color: #ed6000; }
+.description { max-width: 390px; margin: 25px 0 0; color: #596679; font-size: 14px; line-height: 1.85; }
+.detail { max-width: 380px; margin: 17px 0 0; color: #798391; font-size: 12px; line-height: 1.8; }
+.artwork { margin: 0; min-width: 0; }
+.artwork img { display: block; width: 100%; height: auto; }
+.artwork figcaption { text-align: center; color: #8691a0; font-size: 9px; margin-top: 14px; }
+@media (min-width:1600px) { .inner { padding-top: 95px; padding-bottom: 65px; } }
+@media (max-width:1000px) { .inner { padding: 55px 30px 35px; gap: 10px; grid-template-columns: .7fr 1.3fr; }.copy h2 { font-size: 40px; }.label { font-size: 11px; margin-bottom: 20px; } }
+@media (max-width:700px) { .inner { grid-template-columns: 1fr; padding: 45px 23px 30px; gap: 25px; }.copy { padding: 0; }.copy h2 { font-size: 42px; }.copy h2 br:nth-of-type(2) { display: none; }.artwork { margin: 0 -10px; }.label { margin-bottom: 17px; }.artwork figcaption { margin-top: 10px; font-size: 8px; } }

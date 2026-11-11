@@ -20,6 +20,8 @@ def affected_shifts(leave):
 def create_leave(user, business_id, data):
     business = get_object_or_404(Business.objects.select_for_update(), pk=business_id)
     active_membership(user, business_id)
+    from billing.access import require_feature
+    require_feature(business, 'leaves')
     employee = Employee.objects.filter(business=business, user=user, is_active=True).first()
     if not employee:
         raise ValidationError('Necesitas una ficha activa vinculada a tu cuenta en este negocio.')

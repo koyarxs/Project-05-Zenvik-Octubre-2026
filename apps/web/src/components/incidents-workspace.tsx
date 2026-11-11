@@ -15,22 +15,23 @@ import { ErrorNotice, Loading, SuccessNotice } from './feedback';
 const input = 'mt-1 min-h-10 w-full min-w-0 rounded-lg border border-border bg-white px-3 text-sm';
 const time = (value: string | null | undefined) => value ? attendanceTime(value) : 'No disponible';
 type List = Page<Incident> & { summary: Record<string, number>; policy: IncidentPolicy };
-export function IncidentsWorkspace({ business }: { business: Business }) {
+export function IncidentsWorkspace({ business, personal = false }: { business: Business; personal?: boolean }) {
+  const root = personal ? `/asistencia/${business.id}` : `/app/${business.id}`;
   const query = useSearchParams();
   const [page, setPage] = useState(1); const [search, setSearch] = useState(''); const [searchValue, setSearchValue] = useState('');
   const [status, setStatus] = useState(''); const [category, setCategory] = useState(''); const [from, setFrom] = useState(''); const [to, setTo] = useState(''); const [employee, setEmployee] = useState('');
   const [ordering, setOrdering] = useState('-created_at'); const [view, setView] = useState('requests'); const [newRequest, setNewRequest] = useState(query.get('nueva') === '1');
   const [selected, setSelected] = useState<string | null>(query.get('id')); const [settings, setSettings] = useState(false);
-  const base = `/api/v1/businesses/${business.id}/attendance`;
+  const base = `/api/v1/businesses/${business.id}/attendance${personal ? "/personal" : ""}`;
   useEffect(() => { const timer = setTimeout(() => { setSearch(searchValue); setPage(1); }, 350); return () => clearTimeout(timer); }, [searchValue]);
   const params = new URLSearchParams({ page: String(page), ordering });
   for (const [key, value] of Object.entries({ search, status, category, date_from: from, date_to: to, employee, session: query.get('session') ?? '' })) if (value) params.set(key, value);
   const resource = useResource<List>(`${base}/incidents/?${params}`);
-  const data = resource.data; const manager = canManage(business.role);
+  const data = resource.data; const manager = !personal && canManage(business.role);
   return <>
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow text-primary">ASISTENCIA / SOLICITUDES</p><h1 className="mt-2 text-3xl font-bold">{manager ? 'Incidencias' : 'Mis incidencias'}</h1><p className="mt-2 text-sm text-muted-foreground">{business.name} · Seguimiento y regularización</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" onClick={resource.retry}>Actualizar incidencias</Button><Button onClick={() => setNewRequest(true)}>Nueva solicitud</Button>{business.role === 'OWNER' && <Button variant="outline" onClick={() => setSettings(true)}>Política de incidencias</Button>}</div></div>
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow text-primary">ASISTENCIA / SOLICITUDES</p><h1 className="mt-2 text-3xl font-bold">{manager ? 'Incidencias' : 'Mis incidencias'}</h1><p className="mt-2 text-sm text-muted-foreground">{business.name} · Seguimiento y regularización</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" onClick={resource.retry}>Actualizar incidencias</Button><Button onClick={() => setNewRequest(true)}>Nueva solicitud</Button>{!personal && business.role === 'OWNER' && <Button variant="outline" onClick={() => setSettings(true)}>Política de incidencias</Button>}</div></div>
     <p className="mb-4 text-xs text-muted-foreground">Una declaración no reemplaza una marcación capturada. Los ajustes aprobados se muestran por separado y tienen uso operativo.</p>
-    <nav className="mb-4 flex flex-wrap gap-2" aria-label="Vistas de incidencias"><Button variant={view === 'requests' ? 'default' : 'outline'} onClick={() => setView('requests')}>Solicitudes</Button><Button variant={view === 'corrections' ? 'default' : 'outline'} onClick={() => setView('corrections')}>Ajustes operativos</Button>{manager && <Button variant={view === 'audit' ? 'default' : 'outline'} onClick={() => setView('audit')}>Auditoría</Button>}<Button variant="outline" asChild><Link href={`/app/${business.id}/notificaciones`}>Notificaciones</Link></Button></nav>
+    <nav className="mb-4 flex flex-wrap gap-2" aria-label="Vistas de incidencias"><Button variant={view === 'requests' ? 'default' : 'outline'} onClick={() => setView('requests')}>Solicitudes</Button><Button variant={view === 'corrections' ? 'default' : 'outline'} onClick={() => setView('corrections')}>Ajustes operativos</Button>{manager && <Button variant={view === 'audit' ? 'default' : 'outline'} onClick={() => setView('audit')}>Auditoría</Button>}<Button variant="outline" asChild><Link href={`${root}/notificaciones`}>Notificaciones</Link></Button></nav>
     {view === 'audit' && manager ? <AuditPanel base={base} /> : view === 'corrections' ? <CorrectionsPanel base={base} onSelect={setSelected} /> : <>
       <form onSubmit={event => event.preventDefault()} className="surface mb-4 grid min-w-0 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4">
         <label className="text-xs">Buscar trabajador o motivo<input className={input} value={searchValue} maxLength={100} onChange={event => setSearchValue(event.target.value)} /></label>
@@ -40,7 +41,7 @@ export function IncidentsWorkspace({ business }: { business: Business }) {
         <label className="text-xs">Desde<input type="date" className={input} value={from} onChange={event => { setFrom(event.target.value); setPage(1); }} /></label><label className="text-xs">Hasta<input type="date" className={input} value={to} onChange={event => { setTo(event.target.value); setPage(1); }} /></label>
         {manager && <EmployeeFilter business={business} value={employee} onChange={value => { setEmployee(value); setPage(1); }} />}
       </form>
-      {query.get('session') && <p className="mb-3 text-xs">Filtrado por jornada. <Link className="text-primary underline" href={`/app/${business.id}/incidencias`}>Ver todas</Link></p>}
+      {query.get('session') && <p className="mb-3 text-xs">Filtrado por jornada. <Link className="text-primary underline" href={`${root}/incidencias`}>Ver todas</Link></p>}
       {resource.error ? <ErrorNotice message={resource.error.message} retry={resource.retry} /> : !data ? <Loading label="Consultando incidencias…" /> : <>
         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5">{Object.entries(incidentStates).map(([key, label]) => <div key={key} className="surface p-3"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-xl font-bold">{data.summary[key] ?? 0}</p></div>)}</div>
         {!data.count ? <p className="surface p-6">No hay solicitudes para estos filtros.</p> : <div className="space-y-3">{data.results.map(item => <article key={item.id} className="surface flex flex-wrap items-center justify-between gap-3 p-4"><div className="min-w-0"><h2 className="break-words font-semibold">{item.category_label}</h2><p className="mt-1 break-words text-sm">{item.employee_name} · {item.work_date}</p><p className="mt-1 text-xs text-primary">{incidentStates[item.status]}</p></div><Button variant="outline" onClick={() => setSelected(item.id)}>Ver solicitud</Button></article>)}</div>}
@@ -48,7 +49,7 @@ export function IncidentsWorkspace({ business }: { business: Business }) {
       </>}
     </>}
     {newRequest && <Dialog open onOpenChange={setNewRequest} title="Nueva solicitud de regularización" description="Declara lo ocurrido en tu propia asistencia. No se modificarán las marcaciones originales."><IncidentForm base={base} initialSession={query.get('session')} initialDate={query.get('fecha')} onCreated={id => { setNewRequest(false); setSelected(id); resource.retry(); }} /></Dialog>}
-    {selected && <Dialog open onOpenChange={open => { if (!open) { setSelected(null); resource.retry(); } }} title="Detalle de incidencia" description="Evidencia original, declaración y decisiones administrativas."><IncidentDetailPanel key={selected} id={selected} base={base} business={business} /></Dialog>}
+    {selected && <Dialog open onOpenChange={open => { if (!open) { setSelected(null); resource.retry(); } }} title="Detalle de incidencia" description="Evidencia original, declaración y decisiones administrativas."><IncidentDetailPanel key={selected} id={selected} base={base} business={business} personal={personal} /></Dialog>}
     {settings && <Dialog open onOpenChange={setSettings} title="Política de incidencias" description="Reglas operativas de este negocio. No constituyen requisitos legales universales."><PolicyPanel base={base} /></Dialog>}
   </>;
 }
@@ -93,7 +94,7 @@ export function IncidentForm({ base, initialSession, initialDate, onCreated }: {
     </>}{error && <ErrorNotice message={error} />}
   </form>;
 }
-export function IncidentDetailPanel({ base, id, business }: { base: string; id: string; business: Business }) {
+export function IncidentDetailPanel({ base, id, business, personal = false }: { base: string; id: string; business: Business; personal?: boolean }) {
   const resource = useResource<IncidentDetail>(`${base}/incidents/${id}/`);
   const [action, setAction] = useState(''); const [reason, setReason] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const pending = useRef<{ signature: string; request_id: string } | null>(null);
@@ -103,7 +104,7 @@ export function IncidentDetailPanel({ base, id, business }: { base: string; id: 
   return <div className="space-y-4 text-sm"><div><h3 className="font-bold">{item.category_label}</h3><p className="break-words">{item.employee_name} · {item.business_name}</p><p>{item.work_date} · <strong>{incidentStates[item.status]}</strong></p></div>
     <section className="rounded-lg bg-muted p-3"><h3 className="font-bold">Declaración del trabajador</h3><p className="mt-2">{item.declared_at ? time(item.declared_at) : 'Sin declaración de horario'}</p><p className="mt-2 whitespace-pre-wrap break-words">{item.reason}</p>{item.observations && <p className="mt-2 whitespace-pre-wrap break-words">{item.observations}</p>}</section>
     {item.planned_shift && <p>Turno programado: {time(item.planned_shift.starts_at)} — {time(item.planned_shift.ends_at)}</p>}{item.approved_leave && <p className="rounded border border-amber-200 p-2">La fecha tiene un permiso aprobado.</p>}
-    <section><h3 className="mb-2 font-bold">Marcaciones originales</h3>{item.original_session ? <><p className="mb-2 break-all text-xs">Jornada {item.original_session.id}</p><ol className="space-y-3 border-l-2 pl-3">{item.original_session.events.map(event => <li key={event.id}><p className="font-semibold">{eventLabels[event.event_type]}</p><p>{time(event.recorded_at)} · hora del servidor</p><p className="break-all text-xs text-muted-foreground">{event.id}</p><p className="text-xs">{geoLabels[event.geo_result]}</p></li>)}</ol><Link className="mt-3 block text-primary underline" href={`/app/${business.id}/asistencia${canManage(business.role) ? '/supervision' : ''}`}>Consultar asistencia</Link></> : <p>Sin jornada capturada asociada. Esta solicitud no crea marcaciones originales.</p>}</section>
+    <section><h3 className="mb-2 font-bold">Marcaciones originales</h3>{item.original_session ? <><p className="mb-2 break-all text-xs">Jornada {item.original_session.id}</p><ol className="space-y-3 border-l-2 pl-3">{item.original_session.events.map(event => <li key={event.id}><p className="font-semibold">{eventLabels[event.event_type]}</p><p>{time(event.recorded_at)} · hora del servidor</p><p className="break-all text-xs text-muted-foreground">{event.id}</p><p className="text-xs">{geoLabels[event.geo_result]}</p></li>)}</ol><Link className="mt-3 block text-primary underline" href={personal ? `/asistencia/${business.id}/historial` : `/app/${business.id}/asistencia${canManage(business.role) ? "/supervision" : ""}`}>Consultar asistencia</Link></> : <p>Sin jornada capturada asociada. Esta solicitud no crea marcaciones originales.</p>}</section>
     {item.correction && <CorrectionEvidence correction={item.correction} />}
     <section><h3 className="mb-2 font-bold">Historial de decisiones</h3>{!item.decisions.length ? <p>Sin decisiones registradas.</p> : item.decisions.map(decision => <article className="mb-2 rounded-lg border p-3" key={decision.id}><p>{decision.actor_name} · {time(decision.recorded_at)}</p><p className="font-semibold">{incidentStates[decision.previous_state]} → {incidentStates[decision.state]}</p><p className="mt-1 break-words">{decision.reason}</p><p className="mt-1 break-all text-[10px] text-muted-foreground">Correlación: {decision.request_id}</p></article>)}</section>
     {item.review_guidance && <p className="rounded-lg bg-muted p-3">Criterio operativo: {item.review_guidance}</p>}

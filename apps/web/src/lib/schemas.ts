@@ -1,6 +1,17 @@
 import { z } from 'zod';
 export const loginSchema = z.object({ username: z.string().trim().min(1, 'Ingresa tu usuario.').max(150), password: z.string().min(1, 'Ingresa tu contraseña.').max(128) });
-export const registerSchema = loginSchema.extend({ email: z.email('Ingresa un correo válido.'), password: z.string().min(8, 'Usa al menos 8 caracteres.').max(128) });
+export const registrationEmailSchema = z.object({ email: z.string().trim().max(254).pipe(z.email('Ingresa un correo válido.')) });
+export const registerSchema = loginSchema.extend({
+  ...registrationEmailSchema.shape,
+  first_name: z.string().trim().min(1, 'Ingresa tus nombres.').max(150),
+  last_name: z.string().trim().min(1, 'Ingresa tus apellidos.').max(150),
+  phone: z.string().trim().max(30),
+  password: z.string().refine(value => Array.from(value).length >= 15, 'Usa al menos 15 caracteres.')
+    .refine(value => Array.from(value).length <= 128, 'Usa como máximo 128 caracteres.'),
+  passwordConfirmation: z.string().min(1, 'Repite tu contraseña.'),
+}).refine(data => !data.passwordConfirmation || data.password === data.passwordConfirmation, {
+  path: ['passwordConfirmation'], message: 'Las contraseñas no coinciden.',
+});
 export const businessSchema = z.object({ name: z.string().trim().min(1, 'Ingresa el nombre comercial.').max(255), rut: z.string().trim().max(12, 'Revisa el formato del RUT.') });
 export const employeeSchema = z.object({
   first_name: z.string().trim().min(1, 'Ingresa el nombre.').max(150),

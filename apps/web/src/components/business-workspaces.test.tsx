@@ -11,14 +11,14 @@ describe('espacios de trabajo', () => {
     const html = renderToStaticMarkup(<BusinessWorkspaces />);
     expect(html).toContain('Tu primer negocio empieza aquí');
     expect(html.match(/href="\/app\/nuevo-negocio"/g)).toHaveLength(1);
-    expect(html).not.toContain('<img');
+    expect(html).toContain('Haz crecer <em>tu negocio</em>');
   });
   it('conserva identidad, rol y destino de cada negocio sin datos inventados', () => {
     state.businesses = [{ id: 'a', name: 'Taller Sur', rut: '76.123.456-0', role: 'ADMIN', is_active: true, created_at: '', updated_at: '' }];
     const html = renderToStaticMarkup(<BusinessWorkspaces />);
     expect(html).toContain('Taller Sur'); expect(html).toContain('Administrador');
     expect(html).toContain('76.123.456-0'); expect(html).toContain('href="/app/a"');
-    expect(html).toContain('>TS</span>'); expect(html).not.toContain('<img');
+    expect(html).toContain('viewBox="0 0 48 48"');
   });
   it('agenda usa conteos agregados y enlaza el día del negocio correcto', () => {
     const html = renderToStaticMarkup(<WeekAgenda days={[{ date: '2026-10-31', count: 93 }, { date: '2026-11-01', count: 0 }]} businessId="b" />);

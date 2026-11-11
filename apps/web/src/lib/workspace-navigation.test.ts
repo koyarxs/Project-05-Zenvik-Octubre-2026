@@ -11,7 +11,7 @@ describe('navegación del espacio privado', () => {
   });
   it.each(['OWNER', 'ADMIN', 'EMPLOYEE'] as Role[])('genera solo rutas reales del negocio para %s', role => {
     const links = businessNavigation({ ...business, role });
-    expect(links.map(link => link.href)).toEqual(['/app/business-a', '/app/business-a/trabajadores', '/app/business-a/turnos', '/app/business-a/permisos', '/app/business-a/incidencias', '/app/business-a/notificaciones', ...(role === 'EMPLOYEE' ? [] : ['/app/business-a/asistencia/supervision']), '/app/business-a/asistencia']);
+    expect(links.map(link => link.href)).toEqual(['/app/business-a', '/app/business-a/trabajadores', '/app/business-a/turnos', '/app/business-a/permisos', '/app/business-a/incidencias', '/app/business-a/notificaciones', ...(role === 'EMPLOYEE' ? [] : ['/app/business-a/asistencia/supervision']), '/app/business-a/asistencia', ...(role === 'OWNER' ? ['/app/business-a/suscripcion'] : [])]);
     expect(links[0].label).toBe(role === 'EMPLOYEE' ? 'Mi día' : 'Inicio');
     expect(links[1].label).toBe(role === 'EMPLOYEE' ? 'Mi ficha' : 'Trabajadores');
   });

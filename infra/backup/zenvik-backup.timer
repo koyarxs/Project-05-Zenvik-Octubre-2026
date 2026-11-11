@@ -1,0 +1,10 @@
+[Unit]
+Description=Zenvik backup every six hours (proposed schedule)
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:15:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

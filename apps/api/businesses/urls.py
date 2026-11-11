@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import BusinessDetailView, BusinessListCreateView, EmployeeDetailView, EmployeeListCreateView
+from .views import BusinessActivityView, BusinessDetailView, BusinessListCreateView, EmployeeDetailView, EmployeeListCreateView
 from .shift_views import ShiftDetailView, ShiftListCreateView, ShiftBatchView, ShiftHistoryView, PlanningSettingsView
 from .leave_views import LeaveActionView, LeaveDetailView, LeaveListCreateView
 from .dashboard_views import DashboardView
@@ -8,6 +8,7 @@ from .dashboard_views import DashboardView
 from .personnel_views import EmployeeHistoryView, EmployeeImpactView, JobTitlesView, BusinessAccountsView, EmployeeAccessView
 
 urlpatterns = [
+    path('activity/', BusinessActivityView.as_view()),
     path('<uuid:business_id>/job-titles/', JobTitlesView.as_view()),
     path('<uuid:business_id>/accounts/', BusinessAccountsView.as_view()),
     path('<uuid:business_id>/employees/<uuid:pk>/history/', EmployeeHistoryView.as_view()),

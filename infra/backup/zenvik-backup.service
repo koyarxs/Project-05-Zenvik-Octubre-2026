@@ -1,0 +1,20 @@
+[Unit]
+Description=Zenvik encrypted offsite PostgreSQL backup
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=zenvik-backup
+Group=zenvik-backup
+EnvironmentFile=/etc/zenvik/backup.env
+ExecStart=/opt/zenvik/ops-venv/bin/python /opt/zenvik/scripts/backup_job.py
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zenvik-backup
+UMask=0077
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

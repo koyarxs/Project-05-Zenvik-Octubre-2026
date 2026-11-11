@@ -61,6 +61,8 @@ def notify_incident(incident, code, policy):
 def create_incident(user, business_id, data):
     business = get_object_or_404(Business.objects.select_for_update(), pk=business_id)
     active_membership(user, business_id)
+    from billing.access import require_feature
+    require_feature(business, 'incidents')
     hashed = digest(data)
     old = AttendanceIncident.objects.filter(business=business, requester=user, request_id=data['request_id']).first()
     if old:
@@ -136,6 +138,8 @@ def validate_correction(incident):
 def decide_incident(user, business_id, pk, data):
     business = get_object_or_404(Business.objects.select_for_update(), pk=business_id)
     member = active_membership(user, business_id)
+    from billing.access import require_feature
+    require_feature(business, 'incidents')
     policy = policy_data(business)
     query = AttendanceIncident.objects.filter(business=business)
     if member.role not in MANAGER_ROLES:
@@ -175,6 +179,8 @@ def decide_incident(user, business_id, pk, data):
 @transaction.atomic
 def configure(user, business_id, data):
     business = get_object_or_404(Business.objects.select_for_update(), pk=business_id)
+    from billing.access import require_feature
+    require_feature(business, 'incidents')
     if active_membership(user, business_id).role != 'OWNER':
         raise PermissionDenied('Solo OWNER puede configurar los permisos y reglas de regularización.')
     before = policy_data(business)

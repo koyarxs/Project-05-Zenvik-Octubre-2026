@@ -1,13 +1,26 @@
 import json
 import logging
 from urllib.error import URLError
-from urllib.request import Request, urlopen
+from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 from django.conf import settings
 from rest_framework.exceptions import APIException, ValidationError
 
 logger = logging.getLogger('zenvik.security')
 SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def urlopen(request, **kwargs):
+    # Keep the transport injection point used by isolated provider tests.
+    # Never accept a client-selected URL or forward a token through a redirect.
+    if request.full_url != SITEVERIFY_URL:
+        raise ValueError('Unexpected verification destination')
+    return build_opener(NoRedirect()).open(request, **kwargs)
 
 
 class TurnstileUnavailable(APIException):

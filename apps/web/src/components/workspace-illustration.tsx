@@ -1,10 +1,18 @@
+import { useId } from 'react';
+import { BrandMark } from './brand-mark';
+
+/** Decorative vector artwork; no controls or sample business data. */
 export function WorkspaceIllustration() {
-  return <svg aria-hidden="true" viewBox="0 0 250 190" className="workspace-illustration" fill="none">
-    <circle cx="134" cy="91" r="77" fill="#d8edf0" /><circle cx="208" cy="34" r="5" fill="#b5dce1" /><circle cx="43" cy="66" r="4" fill="#b5dce1" /><path d="M38 165H229" stroke="#c5dfe3" strokeWidth="3" strokeLinecap="round" />
-    <path d="M69 77L137 32L204 77" stroke="#b6d3dc" strokeWidth="13" strokeLinejoin="round" /><path d="M72 77H202V161H72V77Z" fill="#fff" /><path d="M82 81H192V150H82V81Z" fill="#eff6f7" />
-    <path d="M62 75L72 57H202L212 75H62Z" fill="#23455c" /><path d="M62 75H87V85C87 98 62 98 62 85V75Z" fill="#2d9caa" /><path d="M87 75H112V85C112 98 87 98 87 85V75Z" fill="#f4fbfb" /><path d="M112 75H137V85C137 98 112 98 112 85V75Z" fill="#2d9caa" /><path d="M137 75H162V85C162 98 137 98 137 85V75Z" fill="#f4fbfb" /><path d="M162 75H187V85C187 98 162 98 162 85V75Z" fill="#2d9caa" /><path d="M187 75H212V85C212 98 187 98 187 85V75Z" fill="#f4fbfb" />
-    <path d="M91 108H126V143H91V108Z" fill="#c8e8e9" stroke="#93bdca" strokeWidth="2" /><path d="M108 108V143M91 125H126" stroke="#fff" strokeWidth="3" /><path d="M148 106H182V160H148V106Z" fill="#b6d7e1" stroke="#93bdca" strokeWidth="2" /><circle cx="174" cy="135" r="2" fill="#476d81" />
-    <path d="M39 146C28 139 24 120 29 113C41 115 47 132 44 146M47 146C57 136 61 117 55 111C44 117 41 136 44 146" fill="#439e9e" /><path d="M33 145H55L52 164H37L33 145Z" fill="#265c71" /><path d="M209 143C200 135 196 115 202 110C213 118 215 132 214 143M216 143C227 137 233 121 229 114C217 118 212 133 214 143" fill="#6bb6ae" /><path d="M205 143H227L224 163H209L205 143Z" fill="#438c9e" />
-    <circle cx="187" cy="153" r="20" fill="#127f89" /><path d="M187 144V162M178 153H196" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
+  const id = useId().replace(/:/g, '');
+  return <svg className="workspace-illustration" viewBox="0 0 400 260" fill="none" aria-hidden="true">
+    <defs><linearGradient id={`${id}-wash`} x1="40" y1="20" x2="390" y2="240" gradientUnits="userSpaceOnUse"><stop stopColor="#e1f5f1" /><stop offset="1" stopColor="#d9f1ef" /></linearGradient><linearGradient id={`${id}-mint`} x1="150" y1="80" x2="300" y2="210" gradientUnits="userSpaceOnUse"><stop stopColor="#a3e4d5" /><stop offset="1" stopColor="#42bcae" /></linearGradient><linearGradient id={`${id}-leaf`} x1="30" y1="100" x2="85" y2="200" gradientUnits="userSpaceOnUse"><stop stopColor="#10b9a2" /><stop offset="1" stopColor="#047f7b" /></linearGradient></defs>
+    <path d="M27 197C-10 150 13 76 72 46C131 15 173 43 219 64C263 85 327 72 368 112C415 156 396 212 347 226C282 246 65 246 27 197Z" fill={`url(#${id}-wash)`} />
+    <ellipse cx="204" cy="232" rx="173" ry="10" fill="#d6e7e9" fillOpacity=".55" />
+    <path d="M111 62Q111 54 120 54L337 50Q347 50 346 61L339 222H102Z" fill="#52768a" /><path d="M119 64L338 61L332 213H111Z" fill="#f9fdfd" /><path d="M119 64L338 61L337 78L118 82Z" fill="#82cec3" /><g fill="#fff"><circle cx="126" cy="73" r="2.5" /><circle cx="134" cy="73" r="2.5" /><circle cx="142" cy="73" r="2.5" /></g><rect x="312" y="66" width="8" height="6" rx="2" fill="#35b9a9" /><circle cx="327" cy="69" r="3" fill="#17ac9c" />
+    <rect x="132" y="95" width="58" height="53" rx="9" fill="#e3f5f1" /><svg x="145" y="104" width="33" height="33" viewBox="0 0 64 64"><BrandMark /></svg>
+    <g fill="#d8e8ec"><rect x="129" y="161" width="60" height="7" rx="2" /><rect x="128" y="175" width="60" height="7" rx="2" /><rect x="127" y="189" width="60" height="7" rx="2" /></g>
+    <rect x="205" y="94" width="117" height="7" rx="2" fill="#e8f1f3" /><rect x="205" y="107" width="117" height="7" rx="2" fill="#e8f1f3" /><rect x="204" y="122" width="116" height="75" rx="4" stroke="#e8f1f3" strokeWidth="5" /><path d="M222 188V168H236V188ZM244 188V154H258V188ZM266 188V141H280V188ZM288 188V128H302V188Z" fill={`url(#${id}-mint)`} />
+    <path d="M87 218H354L349 225Q348 228 339 228H100Q91 228 87 218Z" fill="#afc8d0" /><path d="M199 218H252L247 222H204Z" fill="#91b1be" />
+    <path d="M49 180C43 155 46 123 51 101M51 167L32 147M49 154L72 136" stroke="#148e7f" strokeWidth="2" /><path d="M51 130C24 115 37 79 49 91C64 104 58 122 51 130ZM45 166C22 163 20 132 30 137C45 144 46 156 45 166ZM53 156C53 132 79 117 79 130C79 147 62 157 53 156Z" fill={`url(#${id}-leaf)`} /><path d="M30 178H70L63 224H38Z" fill="#89aebb" /><path d="M30 178H70L68 185H32Z" fill="#9bbec9" />
   </svg>;
 }

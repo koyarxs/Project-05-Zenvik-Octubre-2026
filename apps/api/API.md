@@ -1,5 +1,30 @@
 # API Zenvik v1
 
+## Facturación comercial — Etapa 15
+
+Catálogo público: `GET /api/v1/billing/plans/`. Solo planes/versiones vigentes publicados; precios publicados cuando existen. No incluye secretos. La ausencia de precio no equivale a un plan gratis. `checkout_enabled=false` por defecto.
+
+Prefijo privado: `/api/v1/businesses/{business_id}/billing/`. Requiere sesión, membresía activa y rol **OWNER**; ADMIN y EMPLOYEE reciben 403, negocio ajeno/desconocido 404. Se conservan CSRF, no-store, cookies HttpOnly y límites PostgreSQL (120 GET/minuto, 20 escrituras/minuto por usuario/negocio/método).
+
+| Ruta | Método | Contrato |
+|---|---|---|
+| raíz | GET | Plan, estado, revisión, período, precio, consumo, límites, funcionalidades y acceso previo conservado |
+| `payments/` | GET | Historial paginado de órdenes del negocio; registro interno, no DTE |
+| `checkout/` | POST | `price_id`, `request_id` UUID, `expected_revision`; devuelve `order_id`, `checkout_url`, `environment=sandbox`; 503 sin proveedor configurado |
+| `changes/` | POST | `action` TRIAL/CHANGE/CANCEL/REACTIVATE, `request_id`, `expected_revision`; CHANGE exige `price_id`, TRIAL exige `version_id` |
+
+No se aceptan montos, moneda, negocios alternativos ni estados de pago del navegador. Un cambio solicitado no activa derechos pagados. Cancelación al fin de período; reactivación sin cargo solo mientras el período siga vigente. No hay prorrateo.
+
+Callback: `POST /api/v1/billing/flow/callback/`, form-urlencoded con único campo `token`. No usa sesión del navegador: consulta autenticada `payment/getStatus` a Flow sandbox y valida UUID comercial, referencia, monto exacto y moneda. Evento/referencia únicos y bloqueo por negocio evitan doble activación. Los tokens no se persisten ni se devuelven. El endpoint no habilita producción.
+
+La administración interna está en `/admin/billing/`, exige staff activo, permiso `billing.operate_billing` y permisos específicos del modelo. OWNER no es operador del SaaS. Versiones, precios históricos, órdenes y evidencia tienen restricciones de integridad; cambios de catálogo y acciones internas quedan auditados.
+
+Las nuevas escrituras requieren derechos vigentes; las cuotas se verifican bajo bloqueo de negocio. Consulta de originales y recuperación CSV autorizada permanecen disponibles al suspender o vencer. Los reportes de pantalla requieren `reports`; la exportación de recuperación no tiene bloqueo comercial. El control por plan no reemplaza roles ni la restricción de uso oficial de asistencia.
+
+`POST /businesses/` admite `request_id` UUID opcional para reintentos idempotentes de registro; la web siempre lo envía y conserva mientras no cambien los datos del formulario.
+
+Detalles y limitaciones: [STAGE-15](../../docs/STAGE-15.md), [evaluación de pagos](../../docs/STAGE-15-PAYMENTS.md). La recurrencia nativa Flow y la emisión tributaria no están activadas.
+
 API JSON con sesiones Django. No hay JWT ni CORS abierto. El frontend Next.js
 está en `apps/web` y consume esta API mediante un proxy del mismo origen. Todas las
 consultas privadas requieren una sesión y se delimitan al negocio autorizado.

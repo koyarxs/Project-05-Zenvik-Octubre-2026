@@ -13,6 +13,10 @@ describe('proxy input boundary', () => {
   it('rejects unsafe configured upstreams', () => {
     for (const base of ['file:///tmp', 'http://user:pass@localhost/', 'http://localhost/base/']) expect(() => upstreamTarget(['auth'], '', base)).toThrow();
   });
+  it('permite catálogo y callback comerciales sin exponer administración interna', () => {
+    for (const parts of [['billing', 'plans'], ['billing', 'flow', 'callback']]) expect(upstreamTarget(parts, '', 'http://localhost:8000').pathname).toContain('/api/v1/billing/');
+    expect(() => upstreamTarget(['billing', 'internal'], '', 'http://localhost:8000')).toThrow('Ruta de API no permitida');
+  });
   it('rejects declared oversize before reading', async () => {
     const request = new Request('http://localhost/', { method: 'POST', headers: { 'content-length': String(BODY_LIMIT + 1) }, body: 'small' });
     await expect(limitedBody(request)).rejects.toMatchObject({ status: 413 });

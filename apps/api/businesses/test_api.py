@@ -60,6 +60,26 @@ class BusinessAPITests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Business.objects.count(), before)
 
+    def test_activity_records_each_change_and_respects_membership(self):
+        endpoint = ROOT + 'activity/'
+        self.assertEqual(self.client_for(None).get(endpoint).status_code, 403)
+        self.business.name = 'A renamed'
+        self.business.save()
+        self.business.save()
+        Business.objects.filter(pk=self.business.pk).update(planning_max_minutes=480)
+        with transaction.atomic():
+            Business.objects.filter(pk=self.business.pk).update(name='Rolled back')
+            transaction.set_rollback(True)
+        owner_events = self.client_for(self.owner).get(endpoint)
+        self.assertEqual([event['kind'] for event in owner_events.data], ['updated', 'updated', 'created'])
+        self.assertEqual({event['business_id'] for event in owner_events.data}, {str(self.business.pk)})
+        self.assertEqual(self.client_for(self.worker).get(endpoint).data, [])
+        self.assertEqual(self.client_for(self.outsider).get(endpoint).data, [])
+        self.outsider.is_staff = self.outsider.is_superuser = True
+        self.outsider.save()
+        global_events = self.client_for(self.outsider).get(endpoint).data
+        self.assertEqual({event['business_id'] for event in global_events}, {str(self.business.pk), str(self.other.pk)})
+
     def test_business_list_and_detail_scoped(self):
         client = self.client_for(self.owner)
         response = client.get(ROOT)

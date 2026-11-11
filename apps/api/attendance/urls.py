@@ -2,8 +2,22 @@ from django.urls import path
 from .views import CurrentView, EventsView, HistoryView, PolicyView, ReceiptView
 from .supervision import RosterView, PersonView, ReviewView, ReportView
 from .incident_views import IncidentList, IncidentDetail, IncidentTransition, IncidentPolicyView, IncidentContext, CorrectionsView, AuditView, NotificationsView, NotificationRead, ScanAlertsView
+from . import personal
 
 urlpatterns = [
+    path('submissions/<uuid:request_id>/', personal.SubmissionView.as_view()),
+    path('personal/current/', personal.PersonalCurrentView.as_view()),
+    path('personal/incidents/', personal.PersonalIncidentList.as_view()),
+    path('personal/incidents/context/', IncidentContext.as_view()),
+    path('personal/incidents/policy/', personal.PersonalIncidentPolicy.as_view()),
+    path('personal/incidents/corrections/', personal.PersonalCorrections.as_view()),
+    path('personal/incidents/<uuid:pk>/', personal.PersonalIncidentDetail.as_view()),
+    path('personal/incidents/<uuid:pk>/transition/', personal.PersonalIncidentTransition.as_view()),
+    path('personal/notifications/', personal.PersonalNotifications.as_view()),
+    path('personal/notifications/<uuid:pk>/read/', personal.PersonalNotificationRead.as_view()),
+    path('personal/leave-requests/', personal.PersonalLeaves.as_view()),
+    path('personal/leave-requests/<uuid:pk>/', personal.PersonalLeaveDetail.as_view()),
+    path('personal/leave-requests/<uuid:pk>/cancel/', personal.PersonalLeaveCancel.as_view()),
     path('incidents/', IncidentList.as_view()),
     path('incidents/context/', IncidentContext.as_view()),
     path('incidents/policy/', IncidentPolicyView.as_view()),

@@ -10,8 +10,8 @@ import { ErrorNotice, Loading } from '../feedback';
 
 type Action = 'approve' | 'reject' | 'cancel';
 const actionLabels: Record<Action, string> = { approve: 'aprobar', reject: 'rechazar', cancel: 'cancelar' };
-export function LeavePanel({ businessId, id, onSaved }: { businessId: string; id: string; onSaved: (message: string) => void }) {
-  const path = `/api/v1/businesses/${businessId}/leave-requests/${id}/`;
+export function LeavePanel({ businessId, basePath, personal = false, id, onSaved }: { businessId: string; basePath?: string; personal?: boolean; id: string; onSaved: (message: string) => void }) {
+  const path = `${basePath ?? `/api/v1/businesses/${businessId}/leave-requests/`}${id}/`;
   const resource = useResource<LeaveDetail>(path);
   const [action, setAction] = useState<Action | null>(null);
   const [note, setNote] = useState('');
@@ -36,7 +36,7 @@ export function LeavePanel({ businessId, id, onSaved }: { businessId: string; id
     {leave.affected_shifts.visible && <div className={leave.affected_shifts.count ? 'rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950' : 'rounded-lg bg-muted p-4 text-sm text-muted-foreground'}>
       <p className="font-medium">{leave.affected_shifts.count ? `${leave.affected_shifts.count} turnos afectados` : 'Sin turnos programados en estas fechas'}</p>
       <p className="mt-1">Aprobar no modifica ni cancela turnos. La planificación debe revisarse por separado.</p>
-      {leave.affected_shifts.count > 0 && <><ul className="mt-3 space-y-1">{leave.affected_shifts.results.map(shift => <li key={shift.id}>{dateLabel(localDateTime(shift.starts_at).slice(0, 10))} · {shiftTimeLabel(shift.starts_at, shift.ends_at)}</li>)}</ul>{leave.affected_shifts.count > leave.affected_shifts.results.length && <p className="mt-2">Se muestran los primeros 20 turnos.</p>}<Link className="mt-3 inline-block font-medium underline" href={`/app/${businessId}/turnos`}>Revisar calendario de turnos</Link></>}
+      {!personal && leave.affected_shifts.count > 0 && <><ul className="mt-3 space-y-1">{leave.affected_shifts.results.map(shift => <li key={shift.id}>{dateLabel(localDateTime(shift.starts_at).slice(0, 10))} · {shiftTimeLabel(shift.starts_at, shift.ends_at)}</li>)}</ul>{leave.affected_shifts.count > leave.affected_shifts.results.length && <p className="mt-2">Se muestran los primeros 20 turnos.</p>}<Link className="mt-3 inline-block font-medium underline" href={`/app/${businessId}/turnos`}>Revisar calendario de turnos</Link></>}
     </div>}
     {error && <ErrorNotice message={error} />}
     {action && actionAllowed ? <div className="space-y-4 border-t border-border pt-4"><h3 className="font-semibold">¿Confirmas {actionLabels[action]} esta solicitud?</h3><p className="text-sm text-muted-foreground">La decisión quedará registrada y no podrá modificarse desde este módulo.</p>{action !== 'cancel' && <div><label htmlFor="review-note" className="mb-2 block text-sm font-medium">Observación administrativa (opcional)</label><textarea id="review-note" value={note} maxLength={1000} onChange={e => setNote(e.target.value)} rows={3} className="w-full rounded-md border border-input bg-white p-3 text-sm" /></div>}<div className="flex flex-wrap justify-end gap-3"><Button variant="outline" disabled={busy} onClick={() => setAction(null)}>Volver</Button><Button variant={action === 'approve' ? 'default' : 'destructive'} disabled={busy} onClick={decide}>{busy ? 'Guardando…' : `Confirmar ${actionLabels[action]}`}</Button></div></div> : <div className="flex flex-wrap justify-end gap-3">{leave.can_cancel && <Button variant="outline" onClick={() => setAction('cancel')}>Cancelar solicitud</Button>}{leave.can_review && <><Button variant="outline" onClick={() => setAction('reject')}>Rechazar</Button><Button onClick={() => setAction('approve')}>Aprobar</Button></>}</div>}

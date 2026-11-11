@@ -1,5 +1,7 @@
 # Estado de Zenvik
 
+Actualización del 5 de noviembre de 2026: la capa comercial local de Etapa 15 añade planes/versiones/precios, suscripciones por negocio, derechos, cuotas, órdenes, auditoría y administración protegida. [Estado y evidencia actuales](STAGE-15.md). Los conteos y resultados que siguen son históricos del corte indicado, no el esquema actual. No hay cobros de producción ni recurrencia externa verificada.
+
 Corte de documentación: 29 de octubre de 2026. Fase actual: **MVP funcional local, con rediseño Zenvik 2.0; preparación de piloto pendiente**.
 
 La aplicación conecta Next.js con Django y PostgreSQL reales. Incluye cuentas, negocios, membresías, trabajadores, turnos, solicitudes y dashboard. Las migraciones existentes forman parte del código; la base de desarrollo tiene 16 tablas, incluidas las internas de Django y las relaciones del usuario. No se publican bases de datos, volúmenes ni respaldos.

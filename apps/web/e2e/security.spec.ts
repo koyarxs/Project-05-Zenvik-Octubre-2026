@@ -19,7 +19,8 @@ test('cabeceras, CSRF, límites del proxy y sesión cerrada', async ({ page }) =
   await page.getByLabel('Nombre de usuario', { exact: true }).fill('owner_hardening');
   await page.getByLabel('Contraseña', { exact: true }).fill('Browser-test!pass-9274');
   await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/app(?:\/[^/]+)?$/);
+  if (new URL(page.url()).pathname !== '/app') await page.goto('/app');
   const token = await (await page.request.get('/api/v1/auth/csrf/')).json();
   const text = '<img src=x onerror="window.__zenvikXss=1">';
   const created = await page.request.post(`/api/v1/businesses/${business}/employees/`, { headers: { 'X-CSRFToken': token.csrfToken }, data: { first_name: text, last_name: 'Security test' } });

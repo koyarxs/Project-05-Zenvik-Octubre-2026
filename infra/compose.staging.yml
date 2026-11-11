@@ -1,0 +1,91 @@
+# Prepared only: do not launch against real infrastructure without a release approval.
+name: ${COMPOSE_PROJECT_NAME:-zenvik-staging}
+services:
+  api:
+    image: ${API_IMAGE:-zenvik-api:stage16}
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    environment: &api-environment
+      DJANGO_READ_DOTENV: "False"
+      DJANGO_PRODUCTION: "True"
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT:-staging}
+      DEBUG: "False"
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_key
+      ALLOWED_HOSTS: ${PUBLIC_HOST:?Set the exact staging hostname}
+      HEALTHCHECK_HOST: ${PUBLIC_HOST}
+      DJANGO_BEHIND_PROXY: "True"
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:?Set the private Next proxy peers}
+      PUBLIC_REGISTRATION_ENABLED: "False"
+      DJANGO_ADMIN_ENABLED: "False"
+      TURNSTILE_ENABLED: "False"
+      BILLING_PAYMENT_MODE: ${BILLING_PAYMENT_MODE:-disabled}
+      POSTGRES_HOST: ${POSTGRES_HOST:?Use a private managed database hostname}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:?Set an isolated staging database}
+      POSTGRES_USER: ${POSTGRES_RUNTIME_USER:?Set the least-privilege runtime role}
+      POSTGRES_PASSWORD_FILE: /run/secrets/runtime_password
+      POSTGRES_SSLMODE: verify-full
+      PGSSLROOTCERT: /run/secrets/database_ca
+      STRUCTURED_LOGGING: "True"
+    secrets: [django_key, runtime_password, database_ca]
+    expose: ["8000"]
+    networks: [private]
+    init: true
+    read_only: true
+    tmpfs: [/tmp:size=64m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: ${API_CPUS:-1.0}
+    mem_limit: ${API_MEMORY:-768m}
+    restart: unless-stopped
+    stop_grace_period: 40s
+    logging: &bounded-logs
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  web:
+    image: ${WEB_IMAGE:-zenvik-web:stage16}
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+      args: {APP_ORIGIN: "https://${PUBLIC_HOST}"}
+    environment:
+      APP_ORIGIN: https://${PUBLIC_HOST}
+      DJANGO_API_URL: http://api:8000
+    expose: ["3000"]
+    depends_on:
+      api: {condition: service_healthy}
+    networks: [private, ingress]
+    init: true
+    read_only: true
+    tmpfs: [/tmp:size=64m,mode=1777, /app/.next/cache:size=128m,uid=1000,gid=1000]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: ${WEB_CPUS:-1.0}
+    mem_limit: ${WEB_MEMORY:-512m}
+    restart: unless-stopped
+    logging: *bounded-logs
+  migrate:
+    profiles: [operations]
+    image: ${API_IMAGE:-zenvik-api:stage16}
+    environment:
+      <<: *api-environment
+      POSTGRES_USER: ${POSTGRES_MIGRATION_USER:?Use a separate migration login}
+      POSTGRES_ROLE: ${POSTGRES_OWNER_ROLE:?Use the schema owner role}
+      POSTGRES_PASSWORD_FILE: /run/secrets/migration_password
+    secrets: [django_key, migration_password, database_ca]
+    networks: [private]
+    read_only: true
+    tmpfs: [/tmp:size=64m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: "no"
+    command: [python, manage.py, migrate, --check]
+networks:
+  private: {} # No published API/DB ports. Egress required for managed PG/providers.
+  ingress: {}
+secrets:
+  django_key: {file: "${DJANGO_KEY_FILE:?Supply a secret file outside source control}"}
+  runtime_password: {file: "${RUNTIME_DB_PASSWORD_FILE:?Supply runtime secret file}"}
+  migration_password: {file: "${MIGRATION_DB_PASSWORD_FILE:?Supply separate migration secret file}"}
+  database_ca: {file: "${DATABASE_CA_FILE:?Supply trusted database CA}"}

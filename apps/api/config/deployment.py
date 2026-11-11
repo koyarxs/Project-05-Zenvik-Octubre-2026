@@ -1,6 +1,19 @@
 from urllib.parse import urlsplit
+import ipaddress
 
 from django.core.exceptions import ImproperlyConfigured
+
+
+def validate_registration_email(*, enabled, production, origin, smtp_host, sender):
+    if not enabled:
+        return
+    parsed = urlsplit(origin)
+    schemes = ('https',) if production else ('https', 'http')
+    if (parsed.scheme not in schemes or not parsed.hostname or parsed.username or parsed.password
+            or parsed.path or parsed.query or parsed.fragment):
+        raise ImproperlyConfigured('REGISTRATION_WEB_ORIGIN must be a web origin without credentials or a path.')
+    if production and (not smtp_host or smtp_host == 'localhost' or not sender or '@localhost' in sender):
+        raise ImproperlyConfigured('Public email verification requires a configured SMTP host and sender.')
 
 
 def validate_turnstile_configuration(*, enabled, production, site_key, secret_key, hostnames):
@@ -26,3 +39,28 @@ def validate_production(*, debug, hosts, secret, origins):
         parsed = urlsplit(origin)
         if parsed.scheme != 'https' or not parsed.netloc or '*' in origin or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment:
             raise ImproperlyConfigured('Production CSRF_TRUSTED_ORIGINS must be explicit HTTPS origins without paths.')
+
+
+def validate_infrastructure(*, environment, behind_proxy, trusted_cidrs, sslmode):
+    if environment not in ('staging', 'production'):
+        raise ImproperlyConfigured('Secure deployments require staging or production environment.')
+    if sslmode != 'verify-full':
+        raise ImproperlyConfigured('Secure deployments require POSTGRES_SSLMODE=verify-full and a trusted CA.')
+    if behind_proxy and not trusted_cidrs:
+        raise ImproperlyConfigured('Configure the exact private proxy peers before trusting forwarded headers.')
+    for cidr in trusted_cidrs:
+        try:
+            network = ipaddress.ip_network(cidr)
+            if network.prefixlen == 0:
+                raise ValueError()
+        except ValueError:
+            raise ImproperlyConfigured('TRUSTED_PROXY_CIDRS requires explicit restricted CIDRs.') from None
+
+
+def validate_environment(*, environment, production, read_dotenv):
+    if environment not in ('development', 'staging', 'production'):
+        raise ImproperlyConfigured('Unknown APP_ENVIRONMENT.')
+    if environment in ('staging', 'production') and not production:
+        raise ImproperlyConfigured('Staging and production require secure Django production settings.')
+    if production and read_dotenv:
+        raise ImproperlyConfigured('Secure deployments require DJANGO_READ_DOTENV=False and injected secrets.')
