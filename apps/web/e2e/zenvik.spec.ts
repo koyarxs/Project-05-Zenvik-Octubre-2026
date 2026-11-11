@@ -22,18 +22,18 @@ test('registro, negocio, trabajador, edición, persistencia y cierre de sesión'
   await page.getByRole('link', { name: 'Registrar mi primer negocio' }).click(); await page.getByLabel('Nombre comercial').fill('Negocio creado en navegador'); await page.getByRole('button', { name: 'Registrar negocio', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Negocio creado en navegador' })).toBeVisible(); await expect(page.getByText('Negocio registrado correctamente. Ya puedes comenzar.')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Sin turnos programados' }).first()).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Todo al día por aquí' })).toBeVisible();
+  await expect(page.getByText('0 solicitudes pendientes', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Registrar trabajador', exact: true }).click(); await page.getByLabel('Nombre', { exact: true }).fill('Ana'); await page.getByLabel('Apellido', { exact: true }).fill('Prueba'); await page.getByLabel('Correo electrónico (opcional)').fill('ana-test@example.com'); await page.getByRole('button', { name: 'Registrar trabajador', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Ana Prueba' })).toBeVisible(); await page.getByRole('link', { name: 'Editar trabajador' }).click(); await page.getByLabel('Nombre', { exact: true }).fill('Anita'); await page.getByRole('button', { name: 'Guardar cambios' }).click(); await expect(page.getByRole('heading', { name: 'Anita Prueba' })).toBeVisible();
   await page.reload(); await expect(page.getByRole('heading', { name: 'Anita Prueba' })).toBeVisible();
   await expect.poll(() => page.evaluate(() => localStorage.length)).toBe(0);
   const cookies = await page.context().cookies(); expect(cookies.find(c => c.name === 'sessionid')?.httpOnly).toBe(true); expect(cookies.find(c => c.name === 'csrftoken')?.httpOnly).toBe(true);
-  await page.locator('summary').filter({ hasText: 'Menú de usuario' }).click(); await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await expect(page).toHaveURL(/iniciar-sesion/);
+  await page.getByLabel('Menú de usuario', { exact: true }).first().click(); await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await expect(page).toHaveURL(/iniciar-sesion/);
   await page.goto('/app'); await expect(page).toHaveURL(/iniciar-sesion/);
 });
 test('selección de negocios y datos reales', async ({ page }) => {
   await login(page, 'owner_selection'); await page.getByLabel('Negocio activo').selectOption(a); await expect(page.getByRole('heading', { name: 'Negocio A de prueba' })).toBeVisible();
-  await expect(page.getByText('Fichas de este negocio', { exact: true })).toBeVisible();
+  await expect(page.getByText('Trabajadores activos', { exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/desktop.png', fullPage: true });
   await page.getByLabel('Negocio activo').selectOption(b); await expect(page.getByRole('heading', { name: 'Negocio B de prueba' })).toBeVisible(); await page.getByRole('link', { name: 'Ver trabajadores' }).click(); await expect(page.getByText('Ficha ajena De prueba', { exact: true })).toBeVisible(); await expect(page.getByText('Otra ficha De prueba', { exact: true })).toHaveCount(0);
 });
