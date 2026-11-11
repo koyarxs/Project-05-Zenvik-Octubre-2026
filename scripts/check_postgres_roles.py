@@ -173,7 +173,7 @@ def main():
                 )
                 business_id = uuid.uuid4()
                 app.execute(
-                    "INSERT INTO businesses (id,name,rut,created_at,updated_at,is_active,planning_block_leave,planning_timezone) VALUES (%s,%s,'',now(),now(),true,true,'America/Santiago')",
+                    "INSERT INTO businesses (id,name,rut,legal_name,industry,region,commune,locality,address,contact_email,contact_phone,primary_location,created_at,updated_at,is_active,planning_block_leave,planning_timezone) VALUES (%s,%s,'','','','','','','','','','',now(),now(),true,true,'America/Santiago')",
                     (business_id, "Synthetic role test"),
                 )
                 app.execute(
