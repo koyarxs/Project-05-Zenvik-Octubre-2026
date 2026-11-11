@@ -62,9 +62,10 @@ class HistoryInput(StrictInputMixin, serializers.Serializer):
 
 
 class EventRead(serializers.ModelSerializer):
+    timezone_name = serializers.CharField(source='session.timezone_name', read_only=True)
     class Meta:
         model = AttendanceEvent
-        fields = ['id', 'session', 'employee_name', 'business_name', 'event_type', 'recorded_at', 'sequence', 'location_status', 'geo_result', 'accuracy_meters', 'exception_reason', 'integrity_hash', 'previous_hash']
+        fields = ['id', 'session', 'employee_name', 'business_name', 'event_type', 'recorded_at', 'timezone_name', 'sequence', 'location_status', 'geo_result', 'accuracy_meters', 'exception_reason', 'integrity_hash', 'previous_hash']
 
 
 class SessionRead(serializers.ModelSerializer):

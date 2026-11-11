@@ -33,11 +33,20 @@ test('Turnstile obligatorio en login y validado por el backend', async ({ page }
   await page.getByRole('button', { name: 'Completar verificación de prueba' }).click();
   await expect(button).toBeEnabled();
   await button.click();
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/app(?:\/[^/]+)?$/);
+  if (new URL(page.url()).pathname !== '/app') await page.goto('/app');
 });
 test('registro exige renovar una verificación expirada o fallida', async ({ page }) => {
   await provider(page);
   await page.goto('/registrarse');
+  await page.getByLabel('Nombres', { exact: true }).fill('Ana');
+  await page.getByLabel('Apellidos', { exact: true }).fill('Prueba');
+  await page.getByLabel('Nombre de usuario', { exact: true }).fill('browser_turnstile_registration');
+  await page.getByLabel('Correo electrónico', { exact: true }).fill('browser-turnstile@example.test');
+  await page.getByLabel('Contraseña', { exact: true }).fill(password);
+  await page.getByLabel('Repetir contraseña', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('button', { name: 'Configurar más tarde' }).click();
   const button = page.getByRole('button', { name: 'Crear mi cuenta', exact: true });
   await page.getByRole('button', { name: 'Completar verificación de prueba' }).click();
   await expect(button).toBeEnabled();
@@ -55,9 +64,6 @@ test('registro exige renovar una verificación expirada o fallida', async ({ pag
   await expect(button).toBeDisabled();
   await page.getByRole('button', { name: 'Reintentar verificación' }).click();
   await page.getByRole('button', { name: 'Completar verificación de prueba' }).click();
-  await page.getByLabel('Nombre de usuario', { exact: true }).fill('browser_turnstile_registration');
-  await page.getByLabel('Correo electrónico', { exact: true }).fill('browser-turnstile@example.test');
-  await page.getByLabel('Contraseña', { exact: true }).fill(password);
   await button.click();
   await expect(page.getByText('Tu cuenta está lista', { exact: true })).toBeVisible();
 });

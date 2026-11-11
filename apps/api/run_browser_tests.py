@@ -19,4 +19,4 @@ with connection.cursor() as cursor:
     if cursor.fetchone()[0]:
         raise SystemExit('Unexpected temporary database collision; aborting.')
 settings.DATABASES['default']['TEST']['NAME'] = name
-call_command('test', *(sys.argv[1:] or ['businesses.test_browser']), interactive=False, verbosity=1)
+call_command('test', *(sys.argv[1:] or ['businesses.test_browser', 'billing.test_browser']), interactive=False, verbosity=1)

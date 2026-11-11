@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-11",
+  "fixture": "Datos ficticios interceptados en navegador. No se crean usuarios ni marcaciones.",
+  "screenshots": [
+    {
+      "file": "01-navbar.webp",
+      "title": "Navegación y accesos"
+    },
+    {
+      "file": "02-portada-1.webp",
+      "title": "Portada promocional 1"
+    },
+    {
+      "file": "02-portada-2.webp",
+      "title": "Portada promocional 2"
+    },
+    {
+      "file": "02-portada-3.webp",
+      "title": "Portada promocional 3"
+    },
+    {
+      "file": "03-producto-1.webp",
+      "title": "Producto: Equipo y turnos"
+    },
+    {
+      "file": "03-producto-2.webp",
+      "title": "Producto: Asistencia"
+    },
+    {
+      "file": "03-producto-3.webp",
+      "title": "Producto: Permisos e incidencias"
+    },
+    {
+      "file": "04-mobile.webp",
+      "title": "Experiencia móvil y futuras apps"
+    },
+    {
+      "file": "05-primeros-pasos.webp",
+      "title": "Primeros pasos"
+    },
+    {
+      "file": "06-planes.webp",
+      "title": "Planes y selector de capacidad"
+    },
+    {
+      "file": "07-asistencia-ilustrada.webp",
+      "title": "Demo ilustrada de asistencia"
+    },
+    {
+      "file": "08-preguntas.webp",
+      "title": "Preguntas frecuentes"
+    },
+    {
+      "file": "09-cierre.webp",
+      "title": "Cierre y registro"
+    },
+    {
+      "file": "10-footer.webp",
+      "title": "Footer y firma YB Veltrix Solutions"
+    },
+    {
+      "file": "11-planes-completo.webp",
+      "title": "Página de planes"
+    },
+    {
+      "file": "12-login.webp",
+      "title": "Inicio de sesión"
+    },
+    {
+      "file": "13-registro-cuenta.webp",
+      "title": "Registro: cuenta"
+    },
+    {
+      "file": "14-registro-negocio.webp",
+      "title": "Registro: datos del negocio y localidades"
+    },
+    {
+      "file": "15-registro-resumen.webp",
+      "title": "Registro: resumen previo a creación"
+    },
+    {
+      "file": "16-plataforma-admin.webp",
+      "title": "Consola del administrador de plataforma"
+    },
+    {
+      "file": "17-mis-negocios.webp",
+      "title": "Mis negocios"
+    },
+    {
+      "file": "18-dashboard-negocio.webp",
+      "title": "Inicio del negocio"
+    },
+    {
+      "file": "19-dashboard-agenda.webp",
+      "title": "Agenda y próximos turnos"
+    },
+    {
+      "file": "20-trabajadores.webp",
+      "title": "Directorio de trabajadores"
+    },
+    {
+      "file": "21-ficha-trabajador.webp",
+      "title": "Ficha del trabajador"
+    },
+    {
+      "file": "22-supervision.webp",
+      "title": "Supervisión de asistencia"
+    },
+    {
+      "file": "23-permisos.webp",
+      "title": "Permisos y solicitudes"
+    },
+    {
+      "file": "24-suscripcion.webp",
+      "title": "Suscripción del negocio"
+    },
+    {
+      "file": "25-asistencia-personal.webp",
+      "title": "Portal personal de asistencia"
+    },
+    {
+      "file": "26-asistencia-celular.webp",
+      "title": "Portal personal en celular"
+    },
+    {
+      "file": "27-landing-celular.webp",
+      "title": "Landing en celular"
+    },
+    {
+      "file": "28-navegacion-celular.webp",
+      "title": "Navegación móvil"
+    }
+  ],
+  "errors": []
+}

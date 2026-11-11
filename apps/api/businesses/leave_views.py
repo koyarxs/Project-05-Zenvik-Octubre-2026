@@ -14,6 +14,8 @@ class LeavePermission(BasePermission):
     def has_permission(self, request, view):
         view.membership = active_membership(request.user, view.kwargs['business_id'])
         view.business = view.membership.business
+        from billing.access import guard_request
+        guard_request(request, view.business)
         return True  # Own writes are checked again under the business lock.
 
 

@@ -6,28 +6,29 @@ async function login(page: Page, user: string) {
   await page.getByLabel('Nombre de usuario', { exact: true }).fill(user);
   await page.getByLabel('Contraseña', { exact: true }).fill('Browser-test!pass-9274');
   await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/app(?:\/[^/]+)?$/);
+  if (new URL(page.url()).pathname !== '/app') await page.goto('/app');
   await expect(page.getByRole('heading', { name: 'Tus negocios' })).toBeVisible();
-  await expect(page.locator('.workspace-intro img')).toHaveCount(0);
   await mkdir('../../.artifacts/workspaces', { recursive: true });
 }
 
 test('mis negocios: portada, vistas y apertura del espacio real', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await login(page, 'owner_gallery');
-  await expect(page.locator('.business-card')).toHaveCount(1);
-  await expect(page.locator('.business-card')).toContainText('Propietario');
-  await expect(page.locator('.business-card')).toContainText('RUT no informado');
-  await expect(page.locator('.business-card__avatar')).toHaveText('NA');
+  const business = page.getByRole('link', { name: 'Abrir espacio de Negocio A de prueba', exact: true });
+  await expect(business).toHaveCount(1);
+  await expect(business).toContainText('Propietario');
+  await expect(business).toContainText('RUT no informado');
+  await expect(business.locator('svg[viewBox="0 0 48 48"]')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Registrar negocio', exact: true })).toHaveCount(1);
   for (const link of await page.getByRole('link', { name: 'Registrar negocio', exact: true }).all()) await expect(link).toHaveAttribute('href', '/app/nuevo-negocio');
   await page.screenshot({ path: '../../.artifacts/workspaces/desktop.png', fullPage: true });
   await page.getByRole('button', { name: 'Vista de lista', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Vista de lista', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.business-card')).toHaveClass(/business-card--list/);
+  await expect(page.locator('[data-view="list"]')).toContainText('Negocio A de prueba');
   await page.getByRole('button', { name: 'Vista de tarjetas', exact: true }).click();
-  await expect(page.locator('.business-card')).not.toHaveClass(/business-card--list/);
-  await page.getByRole('link', { name: 'Abrir espacio de Negocio A de prueba', exact: true }).click();
+  await expect(page.locator('[data-view="grid"]')).toContainText('Negocio A de prueba');
+  await business.click();
   await expect(page).toHaveURL(`/app/${process.env.E2E_BUSINESS_A}`);
   await expect(page.getByRole('heading', { name: 'Negocio A de prueba', exact: true })).toBeVisible();
 });
@@ -100,7 +101,7 @@ test('negocio ajeno no expone resumen y selector recupera error', async ({ page 
 test('breadcrumb contextual, actualización real y retorno al directorio', async ({ page }) => {
   await login(page, 'owner_gallery');
   const a = process.env.E2E_BUSINESS_A!;
-  await page.getByLabel('Negocio activo').selectOption(a);
+  await page.getByRole('link', { name: 'Abrir espacio de Negocio A de prueba', exact: true }).click();
   const breadcrumb = page.getByRole('navigation', { name: 'Ruta actual' });
   await expect(breadcrumb.locator('[aria-current="page"]')).toHaveText('Inicio');
   await expect(page.getByText('Trabajadores activos', { exact: true })).toBeVisible();
@@ -113,7 +114,7 @@ test('breadcrumb contextual, actualización real y retorno al directorio', async
   await expect(breadcrumb.locator('[aria-current="page"]')).toHaveText('Editar trabajador');
   await expect(breadcrumb.getByRole('link', { name: 'Ficha del trabajador' })).toHaveAttribute('href', `/app/${a}/trabajadores/${process.env.E2E_COLLEAGUE}`);
   await breadcrumb.getByRole('link', { name: 'Trabajadores', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Tu equipo, en un solo lugar', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Trabajadores', exact: true })).toBeVisible();
   await breadcrumb.getByRole('link', { name: 'Mis negocios', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tus negocios' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Asistencia/ })).toHaveCount(0);
@@ -130,7 +131,7 @@ test('controles accesibles a 320px y foco contenido en navegación móvil', asyn
   const brand = page.getByRole('link', { name: 'Zenvik, mis negocios' });
   await expect(brand).toBeFocused();
   await page.keyboard.press('Shift+Tab');
-  await expect(page.getByRole('button', { name: 'Cerrar sesión desde navegación' })).toBeFocused();
+  await expect(page.locator('#primary-nav').getByLabel('Menú de usuario')).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(brand).toBeFocused();
   await page.getByLabel('Negocio activo').selectOption(process.env.E2E_BUSINESS_A!);

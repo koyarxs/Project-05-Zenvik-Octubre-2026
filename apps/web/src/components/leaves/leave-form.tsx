@@ -9,12 +9,12 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ErrorNotice } from '../feedback';
 
-export function LeaveForm({ businessId, onSaved, onClose }: { businessId: string; onSaved: () => void; onClose: () => void }) {
+export function LeaveForm({ businessId, basePath, onSaved, onClose }: { businessId: string; basePath?: string; onSaved: () => void; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LeaveInput>({ resolver: zodResolver(leaveSchema), defaultValues: { request_type: 'PERSONAL', start_date: todayInSantiago(), end_date: todayInSantiago(), reason: '' } });
   async function submit(values: LeaveInput) {
     setError(null);
-    try { await api(`/api/v1/businesses/${businessId}/leave-requests/`, { method: 'POST', body: values }); onSaved(); }
+    try { await api(basePath ?? `/api/v1/businesses/${businessId}/leave-requests/`, { method: 'POST', body: values }); onSaved(); }
     catch (error) { setError(error instanceof Error ? error.message : 'No pudimos enviar la solicitud.'); }
   }
   return <form onSubmit={handleSubmit(submit)} className="space-y-5" noValidate>

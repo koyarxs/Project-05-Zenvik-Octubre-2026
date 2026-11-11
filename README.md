@@ -1,5 +1,11 @@
 # Zenvik
 
+**Zenvik Asistencia:** acceso personal independiente en `/asistencia`, con selección explícita de negocio, jornada, comprobantes, historial, incidencias, permisos y avisos propios. Comparte las cuentas y registros existentes; el dashboard administrativo conserva sus funciones. [Implementación, pruebas y limitaciones](docs/ASISTENCIA-INDEPENDIENTE.md).
+
+Etapa 16: contenedores de producción, CI sin despliegue, healthchecks, logs seguros, roles PostgreSQL y respaldo/restauración cifrados preparados y comprobados localmente. **No hay infraestructura remota desplegada ni HTTPS, backups externos o alertas operativas validados.** [Informe y evidencia](docs/STAGE-16.md), [comparación cloud](docs/STAGE-16-CLOUD.md), [runbook](infra/README.md).
+
+Actualización local de Etapa 15: catálogo informativo en `/planes` y gestión por negocio en `/app/{businessId}/suscripcion` (solo OWNER). Planes y precios versionados, pruebas, cuotas, confirmación de pagos y administración interna implementados. Los planes iniciales no tienen precios ni cuotas comerciales impuestos; los negocios conservan su acceso previo. **Pagos desactivados por defecto; recurrencia externa y producción pendientes de configuración y validación.** Véanse [informe Etapa 15](docs/STAGE-15.md) y [proveedores](docs/STAGE-15-PAYMENTS.md).
+
 SaaS de gestión de equipos para pequeñas empresas chilenas. Reúne negocios, trabajadores, planificación de turnos y solicitudes de permisos en un mismo espacio, con acceso según membresía y rol.
 
 **Estado: MVP funcional en desarrollo local, con rediseño Zenvik 2.0 y pruebas automatizadas. Preparación para piloto pendiente. No está desplegado ni habilitado para operación comercial pública.**
@@ -44,7 +50,7 @@ Entorno local utilizado: Windows/PowerShell, Python 3.15.0 y Node.js 24.22.0. An
 - Portal del trabajador con sus turnos, ficha y solicitudes; dashboard con información real del negocio.
 - Diseño adaptable, menú contraíble, navegación por teclado, estados de carga/error y movimiento reducido.
 
-La configuración de cuenta es de consulta: todavía no ofrece edición de perfil ni administración de membresías. No se implementan remuneraciones, asistencia electrónica, nómina ni vacaciones legales.
+La configuración de cuenta es de consulta: todavía no ofrece edición de perfil ni administración de membresías. No se implementan remuneraciones, nómina ni vacaciones legales. El módulo técnico de asistencia no se presenta como reloj control certificado o autorizado.
 
 ## Fase actual y próximos pasos
 

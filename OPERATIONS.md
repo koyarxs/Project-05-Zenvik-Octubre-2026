@@ -1,5 +1,7 @@
 # Zenvik — operación segura y recuperación
 
+Actualización Etapa 16: [procedimientos reproducibles y separación de entornos](infra/README.md), [estado de implementación y evidencia](docs/STAGE-16.md). Hay automatización preparada y pruebas sintéticas actuales; el almacenamiento externo y las alertas no están activados. Se conserva el historial operativo siguiente.
+
 Estado: procedimientos preparados y restauración sintética ensayada. No hay
 respaldos automáticos, colector ni alertas configurados/verificados. No hay staging
 autorizado identificado. Nunca restaurar sobre la base principal para probar.

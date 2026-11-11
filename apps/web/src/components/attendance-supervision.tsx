@@ -1,6 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Fingerprint } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useResource } from '@/hooks/use-resource';
 import { api } from '@/lib/http';
 import { canManage, type Business } from '@/lib/types';
@@ -9,32 +11,62 @@ import { todayInSantiago } from '@/lib/shift-time';
 import { Button } from './ui/button';
 import { Dialog } from './ui/dialog';
 import { ErrorNotice, Loading } from './feedback';
+import { AttendanceStateChart } from './attendance-state-chart';
 
 export const operationalLabels: Record<string, string> = { WORKING: 'Trabajando', ON_BREAK: 'En colación', FINISHED: 'Jornada finalizada', LEAVE: 'Permiso aprobado', PENDING: 'Entrada pendiente', FUTURE: 'Turno futuro', UNSCHEDULED: 'Sin turno programado' };
 const indicatorLabels: Record<string, string> = { rejected_attempts: 'Con intentos rechazados', registered: 'Con entrada registrada', possible_late: 'Posibles atrasos', location_incidents: 'Incidencias de ubicación', pending_review: 'Por revisar' };
 const incidentLabels: Record<string, string> = { ...geoLabels, POSSIBLE_LATE: 'Posible atraso (sin tolerancia configurada)', INCOMPLETE: 'Salida pendiente tras el turno', EXCEPTION: 'Excepción justificada por trabajador', TEMPORAL: 'Inconsistencia temporal' };
 type ReviewSession = Omit<AttendanceSession, 'events'> & { incidents: string[]; start_difference_minutes: number | null; end_difference_minutes: number | null; review_state: string; review_version: number; reviews: { id: number; actor: string; recorded_at: string; previous_state: string; state: string; reason: string }[]; events: (AttendanceSession['events'][number] & { sites: { name: string; radius_meters: number; distance_meters: number | null }[] })[] };
 type Row = { employee_id: string; name: string; job_title: string; state: string; approved_leave: boolean; rejected_attempt?: boolean; planned_start: string | null; planned_end: string | null; session: ReviewSession | null; date?: string };
-type Result = { count: number; next: string | null; previous: string | null; results: Row[]; summary?: Record<string, number>; indicators?: Record<string, number>; generated_at: string; timezone: string };
+export type AttendanceDashboard = { entries: { hour: number; count: number }[]; completed_shifts: number };
+type Result = { count: number; next: string | null; previous: string | null; results: Row[]; summary?: Record<string, number>; indicators?: Record<string, number>; generated_at: string; timezone: string; dashboard?: AttendanceDashboard };
 const field = 'min-h-10 w-full min-w-0 rounded-lg border border-border bg-white px-3 text-sm';
 const stamp = (value?: string | null) => value ? attendanceTime(value) : 'Sin registro';
 
-export function AttendanceSummary({ business }: { business: Business }) {
-  const resource = useResource<Result>(`/api/v1/businesses/${business.id}/attendance/supervision/`);
+export function AttendanceSummary({ business, date, onDashboard }: { business: Business; date?: string; onDashboard?: (data: AttendanceDashboard | undefined) => void }) {
+  const query = date ? `?${new URLSearchParams({ date, dashboard: 'true', page: '1' })}` : '';
+  const resource = useResource<Result>(`/api/v1/businesses/${business.id}/attendance/supervision/${query}`);
+  const dashboard = resource.data?.dashboard;
+  useEffect(() => { onDashboard?.(dashboard); }, [dashboard, onDashboard]);
   if (!resource.data) return resource.error ? <ErrorNotice message={resource.error.message} retry={resource.retry} /> : null;
   const counts = resource.data.summary ?? {};
-  return <section className="surface mb-6 p-4"><div className="flex flex-wrap justify-between gap-3"><h2 className="font-bold">Asistencia de hoy</h2><Link className="text-sm font-semibold text-primary" href={`/app/${business.id}/asistencia/supervision`}>Supervisar asistencia →</Link></div><p className="mt-3 text-sm">Trabajando: {counts.WORKING ?? 0} · En colación: {counts.ON_BREAK ?? 0} · Finalizadas: {counts.FINISHED ?? 0} · Entrada pendiente: {counts.PENDING ?? 0}</p><p className="mt-2 text-xs text-muted-foreground">Según marcaciones; no acredita presencia física.</p></section>;
+  return <section className="surface operations-attendance p-4"><div className="operations-panel-heading"><span className="operations-heading-icon"><Fingerprint size={25} aria-hidden="true" /></span><div><h2 className="section-title">Asistencia de hoy</h2><p>Según marcaciones. No acredita presencia física.</p></div><Button asChild size="sm"><Link href={`/app/${business.id}/asistencia/supervision`}>Supervisar asistencia <ArrowRight size={15} /></Link></Button></div><div className="operations-attendance-grid"><AttendanceStateChart counts={counts} showRate={!!date} />{dashboard && <AttendanceTimeline entries={dashboard.entries} />}</div></section>;
+}
+
+function AttendanceTimeline({ entries }: { entries: AttendanceDashboard['entries'] }) {
+  const gradient = useId();
+  const max = Math.max(1, ...entries.map(entry => entry.count));
+  const points = entries.map((entry, index) => ({ x: 12 + 396 * index / Math.max(1, entries.length - 1), y: 85 - entry.count / max * 60, ...entry }));
+  const line = points.map((point, index) => {
+    const previous = points[index - 1];
+    if (!previous) return `M${point.x},${point.y}`;
+    const mid = (previous.x + point.x) / 2;
+    return `C${mid},${previous.y} ${mid},${point.y} ${point.x},${point.y}`;
+  }).join(' ');
+  return <figure className="operations-timeline">
+    <figcaption>Entradas por franja de 2 horas</figcaption>
+    <svg viewBox="0 0 420 104" role="img" aria-label={entries.map(entry => `${entry.hour}:00, ${entry.count} entradas`).join('. ')}>
+      <path d="M12 85H408M12 55H408M12 25H408" stroke="#dce8fa" strokeWidth="1" />
+      <defs><linearGradient id={gradient} x2="0" y2="1"><stop stopColor="#8ac3ff" /><stop offset="1" stopColor="#e5f1ff" /></linearGradient></defs>
+      {line && <path d={`${line} L${points.at(-1)?.x},85 L12,85Z`} fill={`url(#${gradient})`} />}
+      <path d={line} fill="none" stroke="#0876f9" strokeWidth="2.5" strokeLinejoin="round" />
+      {points.map(({ x, y, hour, count }, index) => <g key={hour}><circle cx={x} cy={y} r="2.8" fill="#fff" stroke="#0876f9"><title>{String(hour).padStart(2, '0')}:00 · {count} entradas</title></circle>{index % 2 === 0 && <text x={x} y="101" textAnchor="middle" fontSize="9" fill="#071d49">{String(hour).padStart(2, '0')}:00</text>}</g>)}
+    </svg>
+  </figure>;
 }
 
 export function AttendanceSupervision({ business }: { business: Business }) {
+  const query = useSearchParams();
+  const period = query?.get('periodo');
+  const initialPeriod = period === 'daily' || period === 'weekly' || period === 'monthly' ? period : 'live';
   if (!canManage(business.role)) return <ErrorNotice message="Acceso restringido: solo la administración puede supervisar asistencia." />;
-  return <Supervisor key={business.id} business={business} />;
+  return <Supervisor key={`${business.id}:${initialPeriod}`} business={business} initialPeriod={initialPeriod} />;
 }
-function Supervisor({ business }: { business: Business }) {
+function Supervisor({ business, initialPeriod }: { business: Business; initialPeriod: 'live' | 'daily' | 'weekly' | 'monthly' }) {
   const [date, setDate] = useState(() => todayInSantiago(new Date()));
   const [search, setSearch] = useState(''); const [query, setQuery] = useState('');
   const [job, setJob] = useState(''); const [state, setState] = useState(''); const [ordering, setOrdering] = useState('last_name');
-  const [period, setPeriod] = useState('live'); const [page, setPage] = useState(1);
+  const [period, setPeriod] = useState<string>(initialPeriod); const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Row | null>(null); const [exportError, setExportError] = useState(''); const [exporting, setExporting] = useState(false);
   const exportRequest = useRef<AbortController | null>(null);
   useEffect(() => () => exportRequest.current?.abort(), []);
@@ -54,7 +86,7 @@ function Supervisor({ business }: { business: Business }) {
   return <>
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow text-primary">SUPERVISIÓN OPERATIVA</p><h1 className="mt-2 text-3xl font-extrabold">Asistencia</h1><p className="mt-2 text-sm text-muted-foreground">{business.name} · America/Santiago</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" asChild><Link href={`/app/${business.id}/incidencias`}>Incidencias</Link></Button><Button variant="outline" onClick={retry}>Actualizar asistencia</Button><Button onClick={download} disabled={exporting}>{exporting ? 'Exportando…' : 'Exportar CSV'}</Button></div></div>
     <p className="mb-4 text-xs text-muted-foreground">Estados según marcaciones, sin seguimiento continuo. Las diferencias requieren revisión y no implican una infracción.</p>
-    <form className="surface mb-5 grid min-w-0 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4" onSubmit={event => event.preventDefault()}>
+    <form id="reportes" className="surface mb-5 grid min-w-0 scroll-mt-24 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4" onSubmit={event => event.preventDefault()}>
       <label className="text-xs">Fecha<input className={field} type="date" value={date} onChange={event => { setDate(event.target.value); setPage(1); }} /></label>
       <label className="text-xs">Vista<select aria-label="Vista" className={field} value={period} onChange={event => { setPeriod(event.target.value); setPage(1); }}><option value="live">Panel diario</option><option value="daily">Reporte diario</option><option value="weekly">Reporte semanal</option><option value="monthly">Reporte mensual</option></select></label>
       <label className="text-xs">Buscar trabajador<input className={field} value={search} onChange={event => setSearch(event.target.value)} maxLength={100} /></label>
@@ -64,6 +96,7 @@ function Supervisor({ business }: { business: Business }) {
     </form>
     {exportError && <ErrorNotice message={exportError} />}
     {resource.error ? <ErrorNotice message={resource.error.message} retry={retry} /> : !data ? <Loading label="Consultando asistencia…" /> : <>
+      {data.summary && <section className="surface mb-4 p-4"><AttendanceStateChart counts={data.summary} /></section>}
       {data.summary && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">{Object.entries(operationalLabels).filter(([key]) => key !== 'UNSCHEDULED').map(([key, label]) => <div className="surface p-3" key={key}><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{data.summary?.[key] ?? 0}</p></div>)}</div>}
       {data.indicators && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">{Object.entries(indicatorLabels).map(([key, label]) => <div className="surface p-3" key={key}><p className="text-xs text-muted-foreground">{label}</p><p className="text-xl font-bold">{data.indicators?.[key] ?? 0}</p></div>)}</div>}
       <p className="mb-3 text-xs text-muted-foreground" role="status">{data.count} resultados · Última actualización: {attendanceTime(data.generated_at)}{period === 'live' ? ' · Refresco cada 60 segundos' : ''}</p>

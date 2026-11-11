@@ -1,15 +1,38 @@
 import Image from 'next/image';
+import { CalendarDays, ChartNoAxesColumnIncreasing, Store, UsersRound } from 'lucide-react';
 import { BrandMark } from './brand-mark';
 
+const features = [
+  { label: 'Turnos', icon: CalendarDays },
+  { label: 'Asistencia', icon: UsersRound },
+  { label: 'Reportes', icon: ChartNoAxesColumnIncreasing },
+];
+
 export function AuthHero() {
-  return <section className="relative hidden min-h-[780px] overflow-hidden bg-[#d9dfda] lg:block" aria-label="Zenvik, personas y trabajo en sintonía">
-    <Image src="/images/auth-cafe-v1.png" alt="" fill priority sizes="(min-width: 1280px) 52vw, 50vw" quality={85} className="object-cover object-[50%_48%]" />
-    <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[34%] bg-gradient-to-b from-[#fffdf8]/95 via-[#fffdf8]/60 to-transparent" />
-    <div className="absolute top-10 left-10 z-10 xl:top-12 xl:left-14">
-      <div className="flex items-center gap-3.5 text-[#14263d]">
-        <BrandMark className="h-16 w-16 shrink-0" />
-        <div><p className="font-display text-[40px] leading-none font-extrabold tracking-[-.075em]">zenvik<span className="text-[#167e8e]">.</span></p><p className="mt-2.5 text-[8px] leading-[1.7] font-semibold tracking-[.28em] text-[#4c626d]">MODERN WORKFORCE<br />OPERATING SYSTEM</p></div>
-      </div>
+  return <div className="access-hero">
+    <Image src="/images/auth-cafe-v1.png" alt="" fill preload sizes="(min-width: 900px) 50vw, 100vw" className="access-photo" />
+    <div className="access-brand" role="img" aria-label="Zenvik">
+      <BrandMark tone="orange" className="access-brand-mark" />
+      <span aria-hidden="true">envik</span>
     </div>
-  </section>;
+    <div className="access-caption">
+      <div className="access-badge"><Store aria-hidden="true" /> SaaS para PYMES</div>
+      <p className="access-tagline">Más tiempo<br />para tu <em>negocio</em></p>
+      <p className="access-description">Tu equipo, tus turnos y tu asistencia en un solo lugar.</p>
+      <ul className="access-features">
+        {features.map(({ label, icon: Icon }) => (
+          <li key={label}><span><Icon aria-hidden="true" /></span>{label}</li>
+        ))}
+      </ul>
+    </div>
+    <svg className="access-ribbon" viewBox="0 0 800 250" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="#ff8500" fillOpacity=".85" d="M415 0H590C675 53 710 109 720 202C653 100 545 51 415 0Z" />
+      <path fill="#ffad43" fillOpacity=".55" d="M415 0H495C598 50 665 113 720 202C641 116 541 56 415 0Z" />
+    </svg>
+    <svg className="access-waves" viewBox="0 0 800 170" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="#ff8500" fillOpacity=".9" d="M0 0C133 43 213 143 460 170H0Z" />
+      <path fill="#fff4eb" fillOpacity=".67" d="M0 112C221 4 359 170 565 149C654 140 725 99 800 80V170H0Z" />
+      <path fill="#fff" fillOpacity=".82" d="M0 153C240 81 367 197 590 159C694 141 722 131 800 128V170H0Z" />
+    </svg>
+  </div>;
 }

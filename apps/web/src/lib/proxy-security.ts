@@ -4,7 +4,9 @@ export class ProxyInputError extends Error {
 }
 
 export function upstreamTarget(segments: string[], search: string, base: string): URL {
-  if (!segments.length || !['auth', 'businesses'].includes(segments[0]) || segments.some(segment => !/^[A-Za-z0-9_-]+$/.test(segment))) {
+  const billingPath = segments.join('/');
+  const allowedPrefix = ['auth', 'businesses'].includes(segments[0]) || ['billing/plans', 'billing/flow/callback'].includes(billingPath);
+  if (!segments.length || !allowedPrefix || segments.some(segment => !/^[A-Za-z0-9_-]+$/.test(segment))) {
     throw new ProxyInputError(400, 'Ruta de API no permitida.');
   }
   const upstream = new URL(base);

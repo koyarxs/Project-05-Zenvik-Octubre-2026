@@ -40,6 +40,7 @@ class DashboardTests(TestCase):
         self.assertEqual(response.data['pending_requests'], [])
         self.assertEqual(len(response.data['days']), 7)
         self.assertEqual(response.data['active_employees'], 2)
+        self.assertEqual(response.data['team_summary'], {'total': 2, 'active': 2, 'scheduled_today': 0, 'on_leave': 0})
 
     def test_counts_previews_overnight_and_worker_scope(self):
         for i in range(8):
@@ -50,6 +51,7 @@ class DashboardTests(TestCase):
         LeaveRequest.objects.create(business=self.business, employee=self.colleague, requested_by=self.owner, request_type='PERSONAL', start_date='2026-11-03', end_date='2026-11-03')
         manager = self.summary(self.owner).data
         self.assertEqual(manager['today_count'], 9)
+        self.assertEqual(manager['team_summary']['scheduled_today'], 9)
         self.assertEqual(manager['week_count'], 9)
         self.assertEqual(len(manager['today_shifts']), 6)
         self.assertEqual(len(manager['upcoming_shifts']), 6)
@@ -58,6 +60,7 @@ class DashboardTests(TestCase):
         self.assertNotIn('reason', manager['pending_requests'][0])
         worker = self.summary(self.worker).data
         self.assertIsNone(worker['active_employees'])
+        self.assertIsNone(worker['team_summary'])
         self.assertEqual(worker['today_count'], 1)
         self.assertEqual([row['id'] for row in worker['today_shifts']], [str(own.pk)])
         self.assertEqual(worker['pending_count'], 1)

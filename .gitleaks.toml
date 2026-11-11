@@ -1,0 +1,6 @@
+title = "Zenvik source scan; never print secrets"
+[extend]
+useDefault = true
+[[allowlists]]
+description = "Local/generated state excluded from source artifacts"
+paths = ['''(^|/)(\.git|\.artifacts|\.aws|\.codex|\.agents|node_modules|\.next|\.venv|test-results|playwright-report)/''', '''(^|/)\.env$''']

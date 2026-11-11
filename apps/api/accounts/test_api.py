@@ -1,18 +1,24 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from io import StringIO
+from time import time
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlsplit
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
+from django.core import mail, signing
 from django.db import close_old_connections
 from django.test import TestCase, TransactionTestCase, override_settings
 from django.utils import timezone
 from rest_framework.exceptions import Throttled
 from rest_framework.test import APIClient
+from businesses.models import Business, Membership
 
 from .models import AuthRateLimit
+from .registration_email import TOKEN_LIFETIME, TOKEN_SALT
 from .services import reserve_auth_attempt
+from .session_activity import IDLE_SECONDS, LAST_ACTIVITY, LAST_SEEN, PRESENCE_SECONDS
 
 User = get_user_model()
 PASSWORD = 'Zenvik-test!pass-9274'
@@ -55,13 +61,58 @@ class AuthAPITests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 1)
 
+    def test_registration_creates_owned_business_and_rolls_back_invalid_business(self):
+        account = {
+            'username': 'new-owner', 'email': 'owner@example.com', 'password': PASSWORD,
+            'first_name': 'Ana', 'last_name': 'Prueba', 'phone': '+56912345678',
+        }
+        business = {'name': 'Taller', 'region': 'Los Lagos', 'commune': 'Castro', 'locality': 'Castro',
+                    'team_size': 8, 'primary_location': 'Casa matriz'}
+        invalid = self.client.post(ROOT + 'register/', {**account, 'business': {**business, 'rut': 'inválido'}}, format='json')
+        self.assertEqual(invalid.status_code, 400)
+        self.assertFalse(User.objects.filter(username=account['username']).exists())
+        created = self.client.post(ROOT + 'register/', {
+            **account, 'business': business, 'start_session': True,
+        }, format='json')
+        self.assertEqual(created.status_code, 201, created.data)
+        user = User.objects.get(username=account['username'])
+        self.assertEqual((user.first_name, user.last_name, user.phone), ('Ana', 'Prueba', '+56912345678'))
+        workspace = Business.objects.get(pk=created.data['business_id'])
+        self.assertEqual((workspace.team_size, workspace.primary_location), (8, 'Casa matriz'))
+        self.assertEqual(workspace.locality, 'Castro')
+        self.assertTrue(Membership.objects.filter(user=user, business=workspace, role=Membership.Role.OWNER).exists())
+        session = self.client.get(ROOT + 'me/')
+        self.assertEqual(session.status_code, 200)
+        self.assertEqual(session.data['id'], str(user.pk))
+        self.assertFalse(session.data['is_platform_admin'])
+
     def test_registration_rejects_weak_password_and_privilege_fields(self):
-        for extra in ({'password': '123'}, {'is_staff': True}, {'is_superuser': True}, {'role': 'OWNER'}):
+        for extra in ({'password': 'short-1234'}, {'is_staff': True}, {'is_superuser': True}, {'role': 'OWNER'}):
             with self.subTest(extra=extra):
                 response = self.client.post(ROOT + 'register/', {
                     'username': 'new-user', 'email': 'new@example.com', 'password': PASSWORD, **extra,
                 }, format='json')
                 self.assertEqual(response.status_code, 400)
+
+    @override_settings(REGISTRATION_VERIFY_EMAIL=True, EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_registration_requires_email_proof_before_creating_account(self):
+        account = {'username': 'new-user', 'email': 'new@example.com', 'password': PASSWORD}
+        self.assertEqual(self.client.post(ROOT + 'register/', account, format='json').status_code, 400)
+        response = self.client.post(ROOT + 'registration-email/', {'email': account['email']}, format='json')
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(User.objects.filter(username=account['username']).exists())
+        self.assertEqual(mail.outbox[0].to, [account['email']])
+        link = next(line for line in mail.outbox[0].body.splitlines() if '/registrarse#' in line)
+        token = parse_qs(urlsplit(link).fragment)['verificar'][0]
+        with patch('django.core.signing.time.time', return_value=time() + TOKEN_LIFETIME + 1):
+            expired = self.client.post(ROOT + 'register/', {**account, 'email_verification': token}, format='json')
+        self.assertEqual(expired.status_code, 400)
+        wrong_token = signing.dumps('other@example.com', salt=TOKEN_SALT)
+        mismatch = self.client.post(ROOT + 'register/', {**account, 'email_verification': wrong_token}, format='json')
+        self.assertEqual(mismatch.status_code, 400)
+        verified = {**account, 'email_verification': token}
+        self.assertEqual(self.client.post(ROOT + 'register/', verified, format='json').status_code, 201)
+        self.assertEqual(self.client.post(ROOT + 'register/', {**verified, 'username': 'another'}, format='json').status_code, 400)
 
     def test_login_me_logout_and_session_rotation(self):
         old_session = self.client.session.session_key
@@ -69,15 +120,69 @@ class AuthAPITests(TestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertNotEqual(self.client.session.session_key, old_session)
         self.assertNotEqual(response.data['csrfToken'], self.token)
-        self.assertEqual(set(response.data['user']), {'id', 'username', 'email'})
+        self.assertEqual(set(response.data['user']), {
+            'id', 'username', 'email', 'is_platform_admin',
+            'session_started_at', 'session_expires_at', 'session_server_time',
+        })
+        self.assertFalse(response.data['user']['is_platform_admin'])
         me = self.client.get(ROOT + 'me/')
         self.assertEqual(me.data['id'], str(self.user.pk))
         self.assertIn('no-store', me['Cache-Control'])
         self.assertTrue(response.cookies['sessionid']['httponly'])
+        self.assertFalse(response.cookies['sessionid']['max-age'])
         self.assertEqual(response.cookies['sessionid']['samesite'], 'Lax')
         self.assertFalse(response.cookies['sessionid']['secure'])
         self.assertEqual(self.client.post(ROOT + 'logout/', {}, format='json').status_code, 204)
         self.assertEqual(self.client.get(ROOT + 'me/').status_code, 403)
+
+    def test_session_activity_and_inactivity_expiry(self):
+        login = self.login()
+        started = login.data['user']['session_started_at']
+        session = self.client.session
+        session[LAST_ACTIVITY] = int(time()) - 120
+        session.save()
+        # Polling the API is not interaction and must not extend the session.
+        me = self.client.get(ROOT + 'me/')
+        self.assertEqual(me.data['session_expires_at'], session[LAST_ACTIVITY] + IDLE_SECONDS)
+        activity = self.client.post(ROOT + 'session-activity/', {'interacted': True}, format='json')
+        self.assertEqual(activity.data['session_started_at'], started)
+        self.assertGreater(self.client.session[LAST_ACTIVITY], session[LAST_ACTIVITY])
+        session = self.client.session
+        session[LAST_ACTIVITY] = int(time()) - IDLE_SECONDS - 1
+        session.save()
+        self.assertEqual(self.client.post(ROOT + 'session-activity/', {'interacted': True}, format='json').status_code, 403)
+        self.assertEqual(self.client.get(ROOT + 'me/').status_code, 403)
+
+    def test_session_expires_after_last_visible_tab_stops_reporting(self):
+        self.login()
+        last_activity = self.client.session[LAST_ACTIVITY]
+        presence = self.client.post(ROOT + 'session-activity/', {'interacted': False}, format='json')
+        self.assertEqual(self.client.session[LAST_ACTIVITY], last_activity)
+        self.assertEqual(presence.data['session_expires_at'], self.client.session[LAST_SEEN] + PRESENCE_SECONDS)
+        session = self.client.session
+        session[LAST_SEEN] = int(time()) - PRESENCE_SECONDS - 1
+        session.save()
+        self.assertEqual(self.client.get(ROOT + 'me/').status_code, 403)
+
+    def test_platform_overview_requires_active_staff_superuser(self):
+        endpoint = ROOT + 'platform-overview/'
+        self.assertEqual(self.client.get(endpoint).status_code, 403)
+        self.assertEqual(self.login().status_code, 200)
+        self.assertEqual(self.client.get(endpoint).status_code, 403)
+        self.user.is_staff = True
+        self.user.save(update_fields=['is_staff'])
+        self.assertEqual(self.client.get(endpoint).status_code, 403)
+        self.user.is_superuser = True
+        self.user.save(update_fields=['is_superuser'])
+        self.assertTrue(self.client.get(ROOT + 'me/').data['is_platform_admin'])
+        response = self.client.get(endpoint, {'q': 'ana'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['totals']['users'], 1)
+        self.assertEqual(response.data['users'][0]['username'], 'ana')
+        self.assertIn('no-store', response['Cache-Control'])
+        self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
+        self.assertEqual(self.client.get(endpoint).status_code, 403)
 
     def test_invalid_and_inactive_credentials_have_same_response(self):
         responses = []

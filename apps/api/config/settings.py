@@ -18,8 +18,10 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BASE_DIR.parent.parent
 
-env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(REPO_ROOT / '.env')
+env = environ.FileAwareEnv(DEBUG=(bool, False))
+READ_DOTENV = env.bool('DJANGO_READ_DOTENV', default=True)
+if READ_DOTENV:
+    environ.Env.read_env(REPO_ROOT / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -47,15 +49,19 @@ INSTALLED_APPS = [
     'accounts',
     'businesses',
     'attendance',
+    'billing',
 ]
 
 MIDDLEWARE = [
+    'config.observability.TrustedProxyMiddleware',
+    'config.observability.RequestTelemetryMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'config.middleware.APIBoundaryMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'accounts.session_activity.AppSessionExpiryMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -92,6 +98,8 @@ DATABASES = {
         'HOST': env('POSTGRES_HOST', default='127.0.0.1'),
         'PORT': env('POSTGRES_PORT', default='5435'),
         'OPTIONS': {'sslmode': env('POSTGRES_SSLMODE', default='prefer')},
+        'CONN_MAX_AGE': env.int('POSTGRES_CONN_MAX_AGE', default=0),
+        'CONN_HEALTH_CHECKS': True,
     }
 }
 
@@ -133,6 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -141,8 +150,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Explicit deployment mode keeps local HTTP usable even when DEBUG is False.
 PRODUCTION = env.bool('DJANGO_PRODUCTION', default=False)
+APP_ENVIRONMENT = env('APP_ENVIRONMENT', default='production' if PRODUCTION else 'development')
+BEHIND_PROXY = env.bool('DJANGO_BEHIND_PROXY', default=False)
+TRUSTED_PROXY_CIDRS = env.list('TRUSTED_PROXY_CIDRS', default=[])
+STRUCTURED_LOGGING = env.bool('STRUCTURED_LOGGING', default=PRODUCTION)
+from .deployment import validate_environment
+validate_environment(environment=APP_ENVIRONMENT, production=PRODUCTION, read_dotenv=READ_DOTENV)
 ADMIN_ENABLED = env.bool('DJANGO_ADMIN_ENABLED', default=not PRODUCTION)
 PUBLIC_REGISTRATION_ENABLED = env.bool('PUBLIC_REGISTRATION_ENABLED', default=not PRODUCTION)
+REGISTRATION_VERIFY_EMAIL = env.bool('REGISTRATION_VERIFY_EMAIL', default=PRODUCTION and PUBLIC_REGISTRATION_ENABLED)
+REGISTRATION_WEB_ORIGIN = env('REGISTRATION_WEB_ORIGIN', default='http://127.0.0.1:3000').rstrip('/')
+EMAIL_HOST = env('EMAIL_HOST', default='localhost')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_TIMEOUT = 5
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='Zenvik <no-reply@localhost>')
+from .deployment import validate_registration_email
+validate_registration_email(
+    enabled=PUBLIC_REGISTRATION_ENABLED and REGISTRATION_VERIFY_EMAIL, production=PRODUCTION,
+    origin=REGISTRATION_WEB_ORIGIN, smtp_host=EMAIL_HOST, sender=DEFAULT_FROM_EMAIL,
+)
 TURNSTILE_ENABLED = env.bool('TURNSTILE_ENABLED', default=PRODUCTION)
 TURNSTILE_SITE_KEY = env('TURNSTILE_SITE_KEY', default='')
 TURNSTILE_SECRET_KEY = env('TURNSTILE_SECRET_KEY', default='')
@@ -163,7 +192,7 @@ SECURE_SSL_REDIRECT = PRODUCTION
 # Enable only when Django is private behind a proxy that overwrites this header.
 SECURE_PROXY_SSL_HEADER = (
     ('HTTP_X_FORWARDED_PROTO', 'https')
-    if env.bool('DJANGO_BEHIND_PROXY', default=False) else None
+    if BEHIND_PROXY else None
 )
 SESSION_COOKIE_AGE = 60 * 60 * 8
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
@@ -174,10 +203,35 @@ SECURE_HSTS_PRELOAD = False
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'same-origin'
 X_FRAME_OPTIONS = 'DENY'
+SECURE_REDIRECT_EXEMPT = [r'^health/(live|ready)/$']
+DATABASES['default']['OPTIONS']['connect_timeout'] = env.int('POSTGRES_CONNECT_TIMEOUT', default=5)
+db_role = env('POSTGRES_ROLE', default='')
+if db_role:
+    import re
+    from django.core.exceptions import ImproperlyConfigured
+    if not re.fullmatch(r'[a-z][a-z0-9_]{0,62}', db_role):
+        raise ImproperlyConfigured('POSTGRES_ROLE must be a simple role identifier.')
+    DATABASES['default']['OPTIONS']['options'] = f'-c role={db_role}'
 
 if PRODUCTION:
     from .deployment import validate_production
     validate_production(debug=DEBUG, hosts=ALLOWED_HOSTS, secret=SECRET_KEY, origins=CSRF_TRUSTED_ORIGINS)
+    from .deployment import validate_infrastructure
+    validate_infrastructure(environment=APP_ENVIRONMENT, behind_proxy=BEHIND_PROXY,
+        trusted_cidrs=TRUSTED_PROXY_CIDRS, sslmode=DATABASES['default']['OPTIONS']['sslmode'])
+
+if STRUCTURED_LOGGING:
+    LOGGING = {
+        'version': 1, 'disable_existing_loggers': False,
+        'formatters': {'safe_json': {'()': 'config.observability.SafeJSONFormatter'}},
+        'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'safe_json'}},
+        'root': {'handlers': ['console'], 'level': 'INFO'},
+        'loggers': {
+            'django': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
+            'django.server': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
+            'zenvik': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+        },
+    }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
@@ -188,3 +242,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50,
     'EXCEPTION_HANDLER': 'config.api.exception_handler',
 }
+
+# Development only. No production payment endpoint is implemented or selectable.
+BILLING_PAYMENT_MODE = env('BILLING_PAYMENT_MODE', default='disabled')
+FLOW_SANDBOX_API_KEY = env('FLOW_SANDBOX_API_KEY', default='')
+FLOW_SANDBOX_SECRET_KEY = env('FLOW_SANDBOX_SECRET_KEY', default='')
+FLOW_SANDBOX_CONFIRMATION_URL = env('FLOW_SANDBOX_CONFIRMATION_URL', default='')
+FLOW_SANDBOX_RETURN_URL = env('FLOW_SANDBOX_RETURN_URL', default='')
+if BILLING_PAYMENT_MODE not in ('disabled', 'flow_sandbox') or (PRODUCTION and APP_ENVIRONMENT != 'staging' and BILLING_PAYMENT_MODE != 'disabled'):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('Los pagos de producción no están habilitados en esta etapa.')

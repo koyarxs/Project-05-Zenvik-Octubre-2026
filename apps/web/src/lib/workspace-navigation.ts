@@ -1,7 +1,7 @@
 import type { Business, Role } from './types';
 
 type Module = {
-  id: 'dashboard' | 'employees' | 'shifts' | 'leaves' | 'attendance' | 'supervision' | 'incidents' | 'notifications';
+  id: 'dashboard' | 'employees' | 'shifts' | 'leaves' | 'attendance' | 'supervision' | 'incidents' | 'notifications' | 'subscription';
   segment: string;
   label: string;
   employeeLabel: string;
@@ -19,6 +19,7 @@ export const workspaceModules: readonly Module[] = [
   { id: 'notifications', segment: '/notificaciones', label: 'Notificaciones', employeeLabel: 'Notificaciones', roles: ['OWNER', 'ADMIN', 'EMPLOYEE'] },
   { id: 'supervision', segment: '/asistencia/supervision', label: 'Asistencia', employeeLabel: 'Asistencia', roles: ['OWNER', 'ADMIN'] },
   { id: 'attendance', segment: '/asistencia', label: 'Mi asistencia', employeeLabel: 'Mi asistencia', roles: ['OWNER', 'ADMIN', 'EMPLOYEE'] },
+  { id: 'subscription', segment: '/suscripcion', label: 'Mi suscripción', employeeLabel: 'Mi suscripción', roles: ['OWNER'] },
 ];
 
 export function businessNavigation(business?: Pick<Business, 'id' | 'role'>) {

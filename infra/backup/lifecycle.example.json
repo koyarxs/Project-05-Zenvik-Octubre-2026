@@ -1,0 +1,9 @@
+{
+  "Rules": [{
+    "ID": "zenvik-encrypted-backups-30-days-proposed",
+    "Status": "Enabled",
+    "Filter": {"Prefix": "zenvik/production/"},
+    "Expiration": {"Days": 30},
+    "NoncurrentVersionExpiration": {"NoncurrentDays": 30}
+  }]
+}

@@ -6,7 +6,8 @@ async function open(page: Page, username: string) {
   await page.getByLabel('Nombre de usuario', { exact: true }).fill(username);
   await page.getByLabel('Contraseña', { exact: true }).fill('Browser-test!pass-9274');
   await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/app(?:\/[^/]+)?$/);
+  if (new URL(page.url()).pathname !== '/app') await page.goto('/app');
   await page.goto(`/app/${business}/permisos`);
   await expect(page.getByRole('heading', { name: 'Historial de solicitudes' })).toBeVisible();
 }

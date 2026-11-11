@@ -45,12 +45,22 @@ class DashboardView(APIView):
         request_counts = all_requests.aggregate(**{status: Count('id', filter=Q(status=status)) for status in LeaveRequest.Status.values}) if not manager else None
         # Only fields rendered by the preview: no reasons, emails or review notes.
         requests = pending.select_related('employee').order_by('created_at', 'id')[:4]
+        team = None
+        if manager:
+            team = Employee.objects.filter(business=self.business).aggregate(
+                total=Count('id'), active=Count('id', filter=Q(is_active=True)),
+            )
+            team['scheduled_today'] = shifts.filter(starts_at__lt=boundaries[1]).values('employee_id').distinct().count()
+            team['on_leave'] = all_requests.filter(
+                status='APPROVED', start_date__lte=today, end_date__gte=today,
+            ).values('employee_id').distinct().count()
         return Response({
             'date': today.isoformat(), 'server_now': now.isoformat(), 'timezone': self.business.planning_timezone,
             'worker_profile': {'id': str(person.pk), 'first_name': person.first_name, 'last_name': person.last_name, 'job_title': person.job_title, 'is_active': person.is_active} if person else None,
             'next_shift': ShiftSerializer(next_shift).data if next_shift else None,
             'request_counts': request_counts,
-            'active_employees': Employee.objects.filter(business=self.business, is_active=True).count() if manager else None,
+            'active_employees': team['active'] if team is not None else None,
+            'team_summary': team,
             'today_count': counts['day_0'], 'week_count': counts['total'],
             'pending_count': pending.count(),
             'today_shifts': ShiftSerializer(ordered.filter(starts_at__lt=boundaries[1])[:6], many=True).data,

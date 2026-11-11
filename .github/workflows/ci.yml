@@ -1,0 +1,119 @@
+name: Zenvik CI (checks only, no deployment)
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  application:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
+        env:
+          POSTGRES_DB: zenvik_ci
+          POSTGRES_USER: zenvik_ci
+          POSTGRES_PASSWORD: ci-ephemeral-only-not-a-deployment-secret
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U zenvik_ci -d zenvik_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DJANGO_READ_DOTENV: "False"
+      DJANGO_PRODUCTION: "False"
+      DJANGO_SECRET_KEY: ci-ephemeral-only-configuration-0123456789-ABCDEFGHIJKLMN
+      DEBUG: "False"
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      TURNSTILE_ENABLED: "False"
+      BILLING_PAYMENT_MODE: disabled
+      POSTGRES_DB: zenvik_ci
+      POSTGRES_USER: zenvik_ci
+      POSTGRES_PASSWORD: ci-ephemeral-only-not-a-deployment-secret
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      POSTGRES_SSLMODE: prefer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with: {python-version: "3.13"}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: {node-version: "24", cache: npm, cache-dependency-path: apps/web/package-lock.json}
+      - name: Install fixed application and tool requirements
+        run: python -m pip install -r apps/api/requirements-production.txt -r requirements-operations.txt
+      - name: PostgreSQL 17 client for dump and restore compatibility
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSLo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          echo /usr/lib/postgresql/17/bin >> "$GITHUB_PATH"
+      - name: Backend correctness and configuration
+        run: |
+          ruff check apps/api scripts
+          python scripts/security_scan.py
+          python scripts/verify_configuration.py
+          python scripts/validate_infrastructure.py
+          python apps/api/manage.py check
+          python apps/api/manage.py makemigrations --check --dry-run
+      - name: Format incremental infrastructure code
+        run: ruff format --check apps/api/config/health.py apps/api/config/observability.py apps/api/config/test_operations.py apps/api/config/test_performance.py scripts/backup.py scripts/backup_job.py scripts/check_postgres_roles.py scripts/verify_encrypted_restore.py scripts/security_scan.py scripts/verify_configuration.py scripts/container_smoke.py scripts/run_container_backend_tests.py scripts/validate_infrastructure.py scripts/tests/test_backup.py infra/gunicorn.conf.py infra/container_health.py
+      - name: Backend regression (isolated PostgreSQL 17)
+        working-directory: apps/api
+        run: python run_backend_tests.py
+      - name: Least privilege and encrypted restore (isolated resources)
+        run: |
+          python -m unittest discover -s scripts/tests -v
+          python scripts/check_postgres_roles.py
+          python scripts/verify_encrypted_restore.py
+      - name: Frontend checks
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run build
+          node node_modules/@playwright/test/cli.js install --with-deps chromium
+      - name: Complete browser regression (isolated resources)
+        working-directory: apps/api
+        run: python run_browser_tests.py
+      - name: Dependency audit (no automatic fixes)
+        run: |
+          python -m pip_audit -r apps/api/requirements.txt --no-deps --disable-pip --strict
+          python -m pip_audit -r apps/api/requirements-production.txt --no-deps --disable-pip --strict
+          npm --prefix apps/web audit --audit-level=moderate
+      - name: Python static security analysis
+        run: bandit -r apps/api/config apps/api/accounts apps/api/businesses apps/api/attendance apps/api/billing scripts -ll -x .venv,test_operations.py,test_performance.py,test_browser.py,tests.py,test_api.py,test_security.py,test_incidents.py,test_supervision.py,test_personnel.py,test_planning.py,test_dashboard.py,test_shifts.py,test_leave.py,test_directory.py,test_concurrency.py,test_turnstile.py
+      - name: Upload bounded operational evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: validation-evidence
+          path: |
+            .artifacts/stage16-*.json
+          if-no-files-found: ignore
+          retention-days: 7
+  containers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - name: Build only (no push or rollout)
+        run: |
+          docker build -f apps/api/Dockerfile -t zenvik-api:ci .
+          docker build --build-arg APP_ORIGIN=https://staging.example.invalid -f apps/web/Dockerfile -t zenvik-web:ci .
+          docker image save -o /tmp/api.tar zenvik-api:ci
+          docker image save -o /tmp/web.tar zenvik-web:ci
+      - name: Runtime user, probes, dependency outage and shutdown (no networking)
+        run: python3 scripts/container_smoke.py --api-image zenvik-api:ci --web-image zenvik-web:ci
+      - name: Review containers (high/critical block)
+        run: |
+          docker run --rm -v /tmp:/scan:ro aquasec/trivy:0.76.2 image --input /scan/api.tar --scanners vuln --severity HIGH,CRITICAL --exit-code 1
+          docker run --rm -v /tmp:/scan:ro aquasec/trivy:0.76.2 image --input /scan/web.tar --scanners vuln --severity HIGH,CRITICAL --exit-code 1
+      - name: Secret scan without history or credentials
+        run: docker run --rm -v "$PWD:/source:ro" ghcr.io/gitleaks/gitleaks:v8.30.1 dir /source --redact --config /source/.gitleaks.toml

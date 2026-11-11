@@ -1,11 +1,13 @@
 from django.utils.decorators import method_decorator
+
 from django.db.models import Q
 from django.views.decorators.cache import never_cache
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from .models import Business, Employee, Membership
-from .permissions import BusinessScopedPermission
+from .models import Business, BusinessActivity, Employee, Membership
+from .permissions import BusinessScopedPermission, MANAGER_ROLES
 from .serializers import BusinessSerializer, EmployeeSerializer
 from .services import create_business, write_employee
 from .directory_serializers import EmployeeFilterSerializer
@@ -32,6 +34,25 @@ class BusinessDetailView(BusinessListCreateView, generics.RetrieveAPIView):
 
 
 @method_decorator(never_cache, name='dispatch')
+class BusinessActivityView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        events = BusinessActivity.objects.select_related('business')
+        if not (user.is_active and user.is_staff and user.is_superuser):
+            memberships = Membership.objects.filter(
+                user=user, is_active=True, access_enabled=True, role__in=MANAGER_ROLES,
+            )
+            events = events.filter(business_id__in=memberships.values('business_id'))
+        return Response([
+            {'id': str(event.pk), 'business_id': str(event.business_id), 'business_name': event.business.name,
+             'kind': event.kind, 'occurred_at': event.occurred_at, 'is_active': event.business.is_active}
+            for event in events.order_by('-occurred_at', '-pk')[:20]
+        ])
+
+
+@method_decorator(never_cache, name='dispatch')
 class EmployeeListCreateView(generics.ListCreateAPIView):
     serializer_class = EmployeeSerializer
     permission_classes = [IsAuthenticated, BusinessScopedPermission]
@@ -45,7 +66,9 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         values = filters.validated_data
         if values.get('search'):
             for term in values['search'].split():
-                queryset = queryset.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))
+                queryset = queryset.filter(
+                    Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term)
+                )
         if 'is_active' in values:
             queryset = queryset.filter(is_active=values['is_active'])
         if values.get('job_title'):

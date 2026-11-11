@@ -16,6 +16,8 @@ def write_shift(user, business_id, data, shift_id=None, cancel=False):
             membership = active_membership(user, business_id)
             if membership.role not in MANAGER_ROLES:
                 raise PermissionDenied()
+            from billing.access import require_feature
+            require_feature(business, 'shifts')
             data = dict(data)
             request_id = data.pop('request_id', None)
             expected = data.pop('expected_updated_at', None)

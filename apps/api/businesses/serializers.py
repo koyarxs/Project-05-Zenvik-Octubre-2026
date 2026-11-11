@@ -7,6 +7,7 @@ from .permissions import MANAGER_ROLES
 
 class BusinessSerializer(StrictInputMixin, serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
+    request_id = serializers.UUIDField(write_only=True, required=False)
 
     def get_role(self, business):
         return business.memberships.filter(
@@ -15,9 +16,21 @@ class BusinessSerializer(StrictInputMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'name', 'rut', 'is_active', 'created_at', 'updated_at', 'role')
+        fields = ('id', 'name', 'rut', 'is_active', 'created_at', 'updated_at', 'role', 'request_id')
         read_only_fields = ('id', 'is_active', 'created_at', 'updated_at')
         # Model.full_clean normalizes before enforcing conditional RUT uniqueness.
+        validators = []
+
+
+class RegistrationBusinessSerializer(StrictInputMixin, serializers.ModelSerializer):
+    team_size = serializers.IntegerField(min_value=1, max_value=100000, required=False, allow_null=True)
+
+    class Meta:
+        model = Business
+        fields = (
+            'name', 'rut', 'legal_name', 'industry', 'team_size', 'region', 'commune',
+            'locality', 'address', 'contact_email', 'contact_phone', 'primary_location',
+        )
         validators = []
 
 

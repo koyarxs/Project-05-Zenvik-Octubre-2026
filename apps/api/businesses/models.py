@@ -17,6 +17,16 @@ class Business(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     rut = models.CharField(max_length=12, blank=True)
+    legal_name = models.CharField(max_length=255, blank=True)
+    industry = models.CharField(max_length=120, blank=True)
+    team_size = models.PositiveIntegerField(null=True, blank=True)
+    region = models.CharField(max_length=100, blank=True)
+    commune = models.CharField(max_length=100, blank=True)
+    locality = models.CharField(max_length=120, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    contact_email = models.EmailField(blank=True)
+    contact_phone = models.CharField(max_length=30, blank=True)
+    primary_location = models.CharField(max_length=120, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
@@ -49,6 +59,15 @@ class Business(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BusinessActivity(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    kind = models.CharField(max_length=10)
+    occurred_at = models.DateTimeField()
+
+    class Meta:
+        indexes = [models.Index(fields=['-occurred_at', '-id'], name='business_activity_recent_idx')]
 
 
 class Membership(models.Model):
@@ -90,6 +109,13 @@ class Membership(models.Model):
             business_ids = {value for value in (old_business, self.business_id) if value}
             list(Business.objects.using(database).select_for_update().filter(pk__in=business_ids).order_by('pk'))
             self.clean()
+            prior = type(self).objects.using(database).filter(pk=self.pk).first()
+            manager = self.is_active and self.access_enabled and self.role in ('OWNER', 'ADMIN')
+            was_manager = prior and prior.is_active and prior.access_enabled and prior.role in ('OWNER', 'ADMIN')
+            if manager and not was_manager:
+                from billing.access import check_capacity
+                count = type(self).objects.using(database).filter(business_id=self.business_id, is_active=True, access_enabled=True, role__in=['OWNER', 'ADMIN']).count()
+                check_capacity(self.business, 'administrators', count + 1)
             return super().save(*args, **kwargs)
 
     class Meta:
@@ -161,6 +187,10 @@ class Employee(models.Model):
             list(Business.objects.using(database).select_for_update().filter(pk=self.business_id))
             self.full_clean()
             previous = type(self).objects.using(database).filter(pk=self.pk).first()
+            if self.is_active and (not previous or not previous.is_active):
+                from billing.access import check_capacity, require_feature
+                require_feature(self.business, 'employees')
+                check_capacity(self.business, 'active_employees', type(self).objects.using(database).filter(business_id=self.business_id, is_active=True).count() + 1)
             result = super().save(*args, **kwargs)
             if previous and not EmployeeRevision.objects.using(database).filter(employee=self).exists():
                 EmployeeRevision.objects.using(database).create(employee=self, action='BASELINE', snapshot=previous.snapshot())

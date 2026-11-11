@@ -77,6 +77,8 @@ def geographic_result(location, policy):
 def record_event(user, business_id, data):
     business = get_object_or_404(Business.objects.select_for_update(), pk=business_id)
     active_membership(user, business_id)
+    from billing.access import require_feature
+    require_feature(business, 'attendance')
     payload_hash = digest(data)
     previous = AttendanceEvent.objects.filter(business=business, actor=user, request_id=data['request_id']).first()
     if previous:
@@ -88,6 +90,8 @@ def record_event(user, business_id, data):
         raise ValidationError('Necesitas una ficha activa vinculada a tu cuenta para marcar.')
     policy = policy_data(business)
     location = data['location']
+    if location is not None:
+        require_feature(business, 'geolocation')
     geo = geographic_result(location, policy)
     if policy['location_required'] and location is None and len(data['exception_reason'].strip()) < 10:
         raise ValidationError('Se requiere ubicación. Si no está disponible, registra una excepción explicando la incidencia (mínimo 10 caracteres).')
@@ -133,6 +137,11 @@ def configure_policy(user, business_id, data):
     if data['expected_version'] != (existing.version if existing else 0):
         raise Conflict()
     sites = data['sites']
+    from billing.access import check_capacity, require_feature
+    require_feature(business, 'attendance')
+    if any(site.get('is_active', True) for site in sites):
+        require_feature(business, 'geofences')
+    check_capacity(business, 'active_sites', sum(bool(site.get('is_active', True)) for site in sites))
     ids = [site['id'] for site in sites if 'id' in site]
     if len(ids) != len(set(ids)) or AttendanceSite.objects.filter(business=business, pk__in=ids).count() != len(ids):
         raise ValidationError('Hay ubicaciones no disponibles o repetidas.')

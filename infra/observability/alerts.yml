@@ -1,0 +1,57 @@
+# Vendor-neutral rules to map to managed metrics/log alerts. Not an active collector.
+# Initial proposals: tune using staging measurements and an assigned on-call owner.
+rules:
+  - name: api_unavailable
+    signal: api_readiness_probe
+    condition: three_consecutive_failures
+    window_seconds: 120
+    severity: critical
+  - name: database_unavailable
+    signal: api_ready_failed_and_api_live_ok
+    condition: three_consecutive_failures
+    window_seconds: 120
+    severity: critical
+  - name: elevated_server_errors
+    signal: structured_http_events_status_5xx
+    ratio: 0.02
+    minimum_requests: 50
+    window_seconds: 300
+    severity: high
+  - name: api_latency
+    signal: http_duration_ms_p95
+    threshold_ms: 1500
+    window_seconds: 600
+    severity: warning
+  - name: resources_critical
+    signal: platform_cpu_or_memory_ratio
+    threshold: 0.90
+    window_seconds: 600
+    severity: high
+  - name: database_connections
+    signal: managed_postgres_connections_ratio
+    threshold: 0.80
+    window_seconds: 600
+    severity: warning
+  - name: storage_critical
+    signal: managed_database_or_backup_disk_used_ratio
+    threshold: 0.85
+    window_seconds: 900
+    severity: high
+  - name: backup_stale
+    signal: offsite_last_success_age_seconds
+    threshold_seconds: 28800
+    severity: critical
+  - name: restore_drill_failed_or_stale
+    signal: weekly_restore_verification
+    max_age_days: 8
+    severity: high
+  - name: tls_expiring
+    signal: public_certificate_days_remaining
+    threshold_days: 14
+    severity: high
+  - name: integration_failures
+    signal: billing_or_attendance_5xx
+    count: 5
+    window_seconds: 300
+    severity: high
+# Do not page on ordinary 400/403/409 alone. Aggregate auth/attendance anomalies for review.

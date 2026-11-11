@@ -35,6 +35,16 @@ class SupervisionTests(TestCase):
         self.assertEqual(len(detail.data['results'][0]['events']), 4)
         self.assertNotIn('latitude', str(detail.data))
 
+    def test_dashboard_timeline_counts_real_entries_once(self):
+        self.mark()
+        response = self.get(dashboard='true')
+        self.assertEqual(response.status_code, 200, response.data)
+        dashboard = response.data['dashboard']
+        self.assertEqual([point['hour'] for point in dashboard['entries']], list(range(0, 24, 2)))
+        self.assertEqual(sum(point['count'] for point in dashboard['entries']), 1)
+        self.assertEqual(dashboard['completed_shifts'], 0)
+        self.assertNotIn('dashboard', self.get().data)
+
     def test_pending_future_unscheduled_and_leave(self):
         self.assertEqual(self.get(search='Clara').data['results'][0]['state'], 'UNSCHEDULED')
         shift = Shift.objects.create(business=self.business, employee=self.employee, starts_at=NOW+timedelta(minutes=5), ends_at=NOW+timedelta(hours=2))
